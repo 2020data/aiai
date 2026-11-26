@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新增典藏稿件 — 人工智慧與演講紀錄典藏館</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles/editorial.css" />
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+    <div class="hairline-box p-6 sm:p-8">
+      <div class="pb-4 mb-6 hairline-b">
+        <p class="font-mono-index text-xs uppercase tracking-widest text-zinc-500">NEW ENTRY</p>
+        <h1 class="font-serif-editorial text-3xl font-semibold mt-0.5">新增典藏文章與檔案</h1>
+      </div>
+
+      <form id="upload-form" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium mb-1">標題 *</label>
+            <input type="text" id="title" required class="editorial-input" placeholder="例如：2026 生成式 AI 演講紀實" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium mb-1">主分類（輸入標題/內文時自動偵測，可手動修改）</label>
+            <select id="category" class="editorial-input"></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium mb-1">子分類（可自行輸入新名稱）</label>
+            <input type="text" id="subcategory" class="editorial-input" placeholder="未分類" value="未分類" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium mb-1">內容格式</label>
+            <select id="format" class="editorial-input">
+              <option value="markdown">Markdown（支援 $LaTeX$ 公式）</option>
+              <option value="latex">LaTeX 筆記</option>
+              <option value="pdf">PDF 檔案</option>
+              <option value="docx">Word 文件 (.docx)</option>
+              <option value="pptx">簡報檔 (.pptx)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium mb-1">原文語系</label>
+            <select id="original_lang" class="editorial-input"></select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium mb-1">創作者 / 編輯者（選填，留空則前台不顯示）</label>
+            <input type="text" id="creator_name" class="editorial-input" placeholder="可留空" />
+          </div>
+        </div>
+
+        <!-- 封面圖片設定 -->
+        <div class="p-4 bg-[#F6F4EF] border border-[#D8D3C8] space-y-3">
+          <div class="text-xs font-semibold">封面圖片（貼上免費外部連結 / 上傳照片 / 免費藝廊圖庫）</div>
+          <div class="flex flex-wrap gap-2">
+            <input type="url" id="cover_image_url" class="editorial-input flex-1" placeholder="https://..." />
+            <label class="editorial-btn-outline cursor-pointer !text-xs">
+              上傳圖片
+              <input type="file" id="cover_file_input" accept="image/*" class="hidden" />
+            </label>
+          </div>
+          <div class="flex flex-wrap gap-2 pt-1" id="curated-gallery-bar"></div>
+        </div>
+
+        <!-- 附加檔案上傳（PDF / DOCX / PPTX） -->
+        <div id="file-upload-wrap" class="p-4 bg-[#F6F4EF] border border-[#D8D3C8] hidden">
+          <label class="block text-xs font-semibold mb-1.5">上傳對應檔案（.pdf / .docx / .pptx）</label>
+          <input type="file" id="doc_file_input" accept=".pdf,.docx,.pptx" class="text-xs" />
+        </div>
+
+        <!-- 內文輸入與插入內文圖 -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-medium">內文（Markdown + LaTeX `$...$` / `$$...$$`，附件模式可當摘要）</label>
+            <label class="editorial-btn-outline !py-1 !px-2.5 !text-xs cursor-pointer">
+              插入內文圖片
+              <input type="file" id="inline_img_input" accept="image/*" class="hidden" />
+            </label>
+          </div>
+          <textarea id="raw_text" rows="12" class="editorial-input font-mono-index text-sm" placeholder="# 標題&#10;&#10;在此輸入 Markdown 或數學公式：$$E = mc^2$$"></textarea>
+        </div>
+
+        <div id="upload-status" class="text-xs hidden p-3 border"></div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <a href="./index.html" class="editorial-btn-outline no-underline">取消</a>
+          <button type="submit" id="submit-btn" class="editorial-btn">發佈典藏</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script type="module">
+    import { mountNavbar } from './components/navbar.js';
+    import { APP_CONFIG } from './config/app.config.js';
+    import { getAllCategories } from './config/categories.config.js';
+    import { getCurrentUser } from './modules/auth.module.js';
+    import { createPost, uploadFileToStorage } from './modules/db.module.js';
+    import { classifyContent } from './modules/classifier.module.js';
+    import { CURATED_GALLERY_IMAGES, uploadImage } from './modules/media.module.js';
+
+    await mountNavbar();
+
+    const user = await getCurrentUser();
+    if (!user) {
+      window.location.href = './login.html';
+    }
+
+    // 動態載入可擴充類別 A / B / C 選項
+    const catSelect = document.getElementById('category');
+    catSelect.innerHTML = getAllCategories()
+      .map((c) => `<option value="${c.id}">${c.label}</option>`)
+      .join('');
+
+    // 載入原文語系選項
+    const langSelect = document.getElementById('original_lang');
+    langSelect.innerHTML = APP_CONFIG.SUPPORTED_LANGUAGES.map(
+      (l) => `<option value="${l.code}" ${l.code === APP_CONFIG.DEFAULT_POST_LANG ? 'selected' : ''}>${l.label}</option>`
+    ).join('');
+
+    // 免費藝廊圖庫一鍵套用
+    const galleryBar = document.getElementById('curated-gallery-bar');
+    galleryBar.innerHTML = CURATED_GALLERY_IMAGES.map(
+      (img) => `<button type="button" data-url="${img.url}" class="editorial-btn-outline !py-1 !px-2 !text-[11px]">${img.label}</button>`
+    ).join('');
+    galleryBar.querySelectorAll('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.getElementById('cover_image_url').value = btn.dataset.url;
+      });
+    });
+
+    // 自動分類偵測（使用者手動改過後不再覆蓋）
+    let userManuallyPicked = false;
+    catSelect.addEventListener('change', () => (userManuallyPicked = true));
+
+    const autoDetect = () => {
+      if (userManuallyPicked) return;
+      const res = classifyContent(document.getElementById('title').value, document.getElementById('raw_text').value);
+      if (res.confidence > 0) {
+        catSelect.value = res.category;
+        document.getElementById('subcategory').value = res.subcategory;
+      }
+    };
+    document.getElementById('title').addEventListener('input', autoDetect);
+    document.getElementById('raw_text').addEventListener('input', autoDetect);
+
+    // 格式切換顯示檔案上傳欄
+    const formatSelect = document.getElementById('format');
+    const fileWrap = document.getElementById('file-upload-wrap');
+    formatSelect.addEventListener('change', () => {
+      const needFile = ['pdf', 'docx', 'pptx'].includes(formatSelect.value);
+      fileWrap.classList.toggle('hidden', !needFile);
+    });
+
+    const statusEl = document.getElementById('upload-status');
+    const setStatus = (text, isErr = false) => {
+      statusEl.textContent = text;
+      statusEl.className = `text-xs p-3 border ${isErr ? 'border-red-700 text-red-800 bg-red-50' : 'border-zinc-400 text-zinc-700 bg-zinc-50'}`;
+    };
+
+    // 上傳封面圖
+    document.getElementById('cover_file_input').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setStatus('正在上傳封面圖片...');
+      try {
+        const url = await uploadImage(file);
+        document.getElementById('cover_image_url').value = url;
+        setStatus('封面圖片上傳成功！');
+      } catch (err) {
+        setStatus(`圖片上傳失敗：${err.message}`, true);
+      }
+    });
+
+    // 插入內文圖
+    document.getElementById('inline_img_input').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setStatus('正在上傳內文圖片...');
+      try {
+        const url = await uploadImage(file);
+        const ta = document.getElementById('raw_text');
+        ta.value += `\n\n![圖片說明](${url})\n`;
+        setStatus('已插入圖片語法至內文尾端！');
+      } catch (err) {
+        setStatus(`圖片上傳失敗：${err.message}`, true);
+      }
+    });
+
+    // 送出表單
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      setStatus('正在寫入資料庫...');
+
+      try {
+        let fileUrl = '';
+        const docFile = document.getElementById('doc_file_input').files?.[0];
+        if (docFile) {
+          setStatus('正在上傳附加檔案...');
+          const uploaded = await uploadFileToStorage(docFile, 'docs');
+          fileUrl = uploaded.publicUrl;
+        }
+
+        const created = await createPost({
+          title: document.getElementById('title').value,
+          category: catSelect.value,
+          subcategory: document.getElementById('subcategory').value,
+          format: formatSelect.value,
+          original_lang: langSelect.value,
+          creator_name: document.getElementById('creator_name').value,
+          cover_image_url: document.getElementById('cover_image_url').value,
+          raw_text: document.getElementById('raw_text').value,
+          file_url: fileUrl
+        });
+
+        window.location.href = `./viewer.html?id=${encodeURIComponent(created.id)}`;
+      } catch (err) {
+        setStatus(`發佈失敗：${err.message}`, true);
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
