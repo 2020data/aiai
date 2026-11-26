@@ -35,9 +35,9 @@ export const APP_CONFIG = {
     { code: 'zh-CN', label: '简体中文' }
   ],
 
-  // 7. 歷年演講專區國家設定（對應 speech 資料表的 country 欄位）
+  // 7. 歷年演講專區設定（對應 speech 資料表的 country 欄位）
   COUNTRIES: [
-    { code: 'TW', label: '台灣（東海大學）', short: '台灣 TW' },
-    { code: 'MY', label: '馬來西亞（UTAR）', short: '馬來西亞 MY' }
+    { code: 'TW', label: '2026', short: '2026' },
+    { code: 'MY', label: '2027', short: '2027' }
   ]
 };
