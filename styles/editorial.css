@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@500;600;700&display=swap');
+
+:root {
+  --bg-paper: #F6F4EF;
+  --bg-surface: #FCFBF8;
+  --bg-subtle: #EDE9E0;
+  --ink-primary: #18181B;
+  --ink-secondary: #52525B;
+  --ink-muted: #71717A;
+  --hairline: #D8D3C8;
+
+  /* 預設三大分類主題色（新增類別 D/E 時由 JS 自動注入 --cat-color） */
+  --theme-cat-a: #2E4F3E; /* 深森林綠 */
+  --theme-cat-b: #1E3A5F; /* 普魯士藍 */
+  --theme-cat-c: #7C3A2D; /* 赤陶紅 */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-paper);
+  color: var(--ink-primary);
+  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif-editorial {
+  font-family: 'Cormorant Garamond', 'Noto Serif TC', Georgia, serif;
+  letter-spacing: 0.02em;
+}
+
+.font-mono-index {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 極細分割線 */
+.hairline-b { border-bottom: 1px solid var(--hairline); }
+.hairline-t { border-top: 1px solid var(--hairline); }
+.hairline-r { border-right: 1px solid var(--hairline); }
+.hairline-box {
+  border: 1px solid var(--hairline);
+  background-color: var(--bg-surface);
+}
+
+/* 可擴充類別導覽按鈕 */
+.cat-nav-btn {
+  --btn-accent: var(--ink-primary);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid var(--hairline);
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cat-nav-btn::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background-color: var(--btn-accent);
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform 180ms ease;
+}
+
+.cat-nav-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--btn-accent);
+  color: var(--btn-accent);
+}
+
+.cat-nav-btn.is-active {
+  background-color: var(--btn-accent);
+  border-color: var(--btn-accent);
+  color: #F6F4EF;
+}
+
+.cat-nav-btn.is-active::before {
+  background-color: #F6F4EF;
+}
+
+/* 卡片懸浮微動效 */
+.gallery-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--hairline);
+  transition: transform 220ms ease, border-color 220ms ease;
+}
+
+.gallery-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ink-primary);
+}
+
+/* 雜誌感內文排版 */
+.editorial-prose {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--ink-primary);
+}
+
+.editorial-prose h1,
+.editorial-prose h2,
+.editorial-prose h3 {
+  font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.35;
+}
+
+.editorial-prose h1 { font-size: 2rem; border-bottom: 1px solid var(--hairline); padding-bottom: 0.4rem; }
+.editorial-prose h2 { font-size: 1.55rem; }
+.editorial-prose h3 { font-size: 1.25rem; }
+.editorial-prose p { margin-bottom: 1.15rem; }
+.editorial-prose ul, .editorial-prose ol { margin: 0 0 1.25rem 1.5rem; }
+.editorial-prose ul { list-style: disc; }
+.editorial-prose ol { list-style: decimal; }
+
+.editorial-prose blockquote {
+  border-left: 2px solid var(--ink-primary);
+  padding: 0.5rem 1.25rem;
+  margin: 1.5rem 0;
+  background-color: var(--bg-subtle);
+  color: var(--ink-secondary);
+}
+
+.editorial-prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
+  display: block;
+  border: 1px solid var(--hairline);
+}
+
+.editorial-prose pre {
+  background-color: #1F1F23;
+  color: #F4F4F5;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+}
+
+.editorial-prose code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  background-color: var(--bg-subtle);
+  padding: 0.12rem 0.35rem;
+}
+
+.editorial-prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.editorial-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+}
+
+.editorial-prose th, .editorial-prose td {
+  border: 1px solid var(--hairline);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+
+.editorial-prose th {
+  background-color: var(--bg-subtle);
+  font-weight: 600;
+}
+
+/* KaTeX 公式藝廊風格 */
+.katex-display {
+  padding: 1rem 1.25rem;
+  background-color: #EFECE5;
+  border-left: 2px solid var(--hairline);
+  overflow-x: auto;
+  margin: 1.5rem 0 !important;
+}
+
+/* 極簡輸入框 */
+.editorial-input {
+  width: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--hairline);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+  color: var(--ink-primary);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.editorial-input:focus {
+  border-color: var(--ink-primary);
+}
+
+.editorial-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--ink-primary);
+  background-color: var(--ink-primary);
+  color: #F6F4EF;
+  cursor: pointer;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.editorial-btn:hover { opacity: 0.88; }
+
+.editorial-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--hairline);
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.editorial-btn-outline:hover {
+  border-color: var(--ink-primary);
+  background-color: var(--bg-subtle);
+}
