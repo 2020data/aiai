@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>歷年演講專區 — 人工智慧與演講紀錄典藏館</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <link rel="stylesheet" href="./styles/editorial.css" />
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <!-- 國家與年度選擇列 -->
+    <div id="year-switcher" class="hairline-box p-4 mb-6 flex flex-wrap items-center justify-between gap-3"></div>
+
+    <!-- 主內容區 -->
+    <div id="speech-content-root" class="hairline-box p-6 sm:p-10">
+      <div class="text-sm text-zinc-500 py-10 text-center">載入歷年專區中...</div>
+    </div>
+
+    <!-- 線上編輯彈出面板（僅登入者可見） -->
+    <section id="speech-editor-section" class="hidden hairline-box p-6 sm:p-8 mt-6">
+      <h2 class="font-serif-editorial text-2xl font-semibold mb-4">編輯 / 建立年度演講專頁</h2>
+      <form id="speech-editor-form" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-medium mb-1">年度 (Year)</label>
+            <input type="number" id="ed-year" required class="editorial-input" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">國家 / 場域</label>
+            <select id="ed-country" class="editorial-input">
+              <option value="TW">TW 台灣（東海大學）</option>
+              <option value="MY">MY 馬來西亞（UTAR）</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">創作者 / 編輯者（可留空）</label>
+            <input type="text" id="ed-creator" class="editorial-input" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium mb-1">專頁標題 *</label>
+            <input type="text" id="ed-title" required class="editorial-input" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">副標題</label>
+            <input type="text" id="ed-subtitle" class="editorial-input" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">活動日期</label>
+            <input type="text" id="ed-date" class="editorial-input" placeholder="2026-08-15" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">活動地點</label>
+            <input type="text" id="ed-location" class="editorial-input" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">封面圖片 URL</label>
+            <input type="url" id="ed-cover" class="editorial-input" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium mb-1">宣傳照片牆 JSON（格式：`[{"url":"圖片網址","link":"外部相簿網址","caption":"說明"}]`）</label>
+          <textarea id="ed-gallery" rows="3" class="editorial-input font-mono-index text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium mb-1">活動總覽（Markdown）</label>
+          <textarea id="ed-overview" rows="5" class="editorial-input font-mono-index text-xs"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium mb-1">委員會名單（Markdown）</label>
+            <textarea id="ed-committee" rows="4" class="editorial-input font-mono-index text-xs"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium mb-1">工作人員名單（Markdown）</label>
+            <textarea id="ed-staff" rows="4" class="editorial-input font-mono-index text-xs"></textarea>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium mb-1">自訂切分子頁面 JSON（格式：`[{"slug":"schedule","title":"議程表","content_md":"# 議程..."}]`）</label>
+          <textarea id="ed-subpages" rows="4" class="editorial-input font-mono-index text-xs"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" id="ed-cancel" class="editorial-btn-outline">取消</button>
+          <button type="submit" class="editorial-btn">儲存年度專頁</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module">
+    import { mountNavbar } from './components/navbar.js';
+    import { APP_CONFIG } from './config/app.config.js';
+    import { getCurrentUser } from './modules/auth.module.js';
+    import { listSpeechYears, getSpeechPage, saveSpeechPage, cloneToNextYear } from './modules/competition.module.js';
+    import { renderMarkdownWithMath } from './modules/parser.module.js';
+    import { renderShareBar } from './modules/share.module.js';
+    import { escapeHTML } from './modules/sanitizer.module.js';
+    import { icon } from './modules/icons.module.js';
+
+    await mountNavbar('speech_special');
+
+    const params = new URLSearchParams(window.location.search);
+    const [allYears, user] = await Promise.all([listSpeechYears().catch(() => []), getCurrentUser()]);
+
+    const defaultYear = params.get('year') || allYears[0]?.year || new Date().getFullYear();
+    const defaultCountry = params.get('country') || allYears[0]?.country || 'TW';
+    const activeTab = params.get('tab') || 'overview';
+
+    const record = await getSpeechPage(defaultYear, defaultCountry).catch(() => null);
+
+    // 渲染年度切換列
+    const switcher = document.getElementById('year-switcher');
+    const yearLinks = allYears
+      .map(
+        (y) => `
+        <a href="./competition.html?year=${y.year}&country=${y.country}"
+           class="font-mono-index text-xs px-2.5 py-1 border ${
+             String(y.year) === String(defaultYear) && y.country === defaultCountry
+               ? 'bg-[#2E4F3E] text-[#F6F4EF] border-[#2E4F3E]'
+               : 'border-[#D8D3C8] bg-[#F6F4EF]'
+           }">
+          ${y.year} · ${y.country}
+        </a>`
+      )
+      .join('');
+
+    switcher.innerHTML = `
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold text-[#2E4F3E] mr-1">歷年年度：</span>
+        ${yearLinks || '<span class="text-xs text-zinc-500">尚未建立年度頁面</span>'}
+      </div>
+      ${
+        user
+          ? `
+          <div class="flex flex-wrap gap-2">
+            <button id="btn-open-editor" type="button" class="editorial-btn-outline !text-xs">${icon('edit')} ${record ? '編輯本年度' : '建立本年度'}</button>
+            ${record ? `<button id="btn-clone-next" type="button" class="editorial-btn !text-xs">${icon('copy')} 一鍵延續至 ${Number(record.year) + 1} 年</button>` : ''}
+          </div>`
+          : ''
+      }
+    `;
+
+    const contentRoot = document.getElementById('speech-content-root');
+
+    if (!record) {
+      contentRoot.innerHTML = `
+        <div class="py-12 text-center space-y-3">
+          <h1 class="font-serif-editorial text-2xl">${escapeHTML(defaultYear)} 年度（${escapeHTML(defaultCountry)}）尚無紀錄</h1>
+          <p class="text-sm text-zinc-500">${user ? '請點擊右上角「建立本年度」開始新增專頁。' : '請登入後新增年度演講紀錄。'}</p>
+        </div>
+      `;
+    } else {
+      const countryLabel = APP_CONFIG.COUNTRIES.find((c) => c.code === record.country)?.label || record.country;
+      const extraTabs = Array.isArray(record.extra_subpages) ? record.extra_subpages : [];
+      const tabs = [
+        { slug: 'overview', title: '活動總覽', md: record.overview_md },
+        { slug: 'committee', title: '委員會', md: record.committee_md },
+        { slug: 'staff', title: '工作人員', md: record.staff_md },
+        ...extraTabs.map((t) => ({ slug: t.slug, title: t.title, md: t.content_md }))
+      ];
+
+      const currentTabObj = tabs.find((t) => t.slug === activeTab) || tabs[0];
+      const gallery = Array.isArray(record.gallery_items) ? record.gallery_items : [];
+
+      contentRoot.innerHTML = `
+        ${
+          record.cover_image_url
+            ? `<img src="${escapeHTML(record.cover_image_url)}" alt="${escapeHTML(record.title)}" class="w-full max-h-[380px] object-cover mb-6 border border-[#D8D3C8]" />`
+            : ''
+        }
+
+        <header class="pb-5 mb-6 hairline-b">
+          <div class="font-mono-index text-xs text-[#2E4F3E] mb-1">${record.year} · ${escapeHTML(countryLabel)}</div>
+          <h1 class="font-serif-editorial text-3xl sm:text-4xl font-semibold">${escapeHTML(record.title)}</h1>
+          ${record.subtitle ? `<p class="text-zinc-600 mt-1.5">${escapeHTML(record.subtitle)}</p>` : ''}
+          <div class="flex flex-wrap gap-4 text-xs text-zinc-500 mt-3">
+            ${record.event_date ? `<span>日期：${escapeHTML(record.event_date)}</span>` : ''}
+            ${record.location ? `<span>地點：${escapeHTML(record.location)}</span>` : ''}
+            ${record.creator_name ? `<span>編輯者：${escapeHTML(record.creator_name)}</span>` : ''}
+          </div>
+          <div id="speech-share-bar" class="mt-4"></div>
+        </header>
+
+        ${
+          gallery.length
+            ? `
+            <section class="mb-8">
+              <h2 class="font-serif-editorial text-xl font-semibold mb-3">宣傳與現場照片牆</h2>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                ${gallery
+                  .map(
+                    (g) => `
+                    <a href="${escapeHTML(g.link || g.url)}" target="_blank" rel="noopener" class="block border border-[#D8D3C8] bg-[#F6F4EF] hover:border-[#18181B] transition no-underline">
+                      <img src="${escapeHTML(g.url)}" alt="${escapeHTML(g.caption || '')}" class="w-full h-32 object-cover" loading="lazy" />
+                      ${g.caption ? `<div class="p-2 text-[11px] text-zinc-600 truncate">${escapeHTML(g.caption)}</div>` : ''}
+                    </a>`
+                  )
+                  .join('')}
+              </div>
+            </section>`
+            : ''
+        }
+
+        <!-- 子頁面切換列（獨立 &tab= 網址） -->
+        <div class="flex flex-wrap gap-2 pb-4 mb-6 hairline-b">
+          ${tabs
+            .map(
+              (tab) => `
+              <a href="./competition.html?year=${record.year}&country=${record.country}&tab=${encodeURIComponent(tab.slug)}"
+                 class="px-3 py-1.5 text-xs border transition no-underline ${
+                   currentTabObj.slug === tab.slug
+                     ? 'bg-[#18181B] text-[#F6F4EF] border-[#18181B]'
+                     : 'bg-[#F6F4EF] text-[#18181B] border-[#D8D3C8] hover:border-[#18181B]'
+                 }">
+                ${escapeHTML(tab.title)}
+              </a>`
+            )
+            .join('')}
+        </div>
+
+        <div class="editorial-prose">${renderMarkdownWithMath(currentTabObj.md || '（尚無內容）')}</div>
+      `;
+
+      renderShareBar(document.getElementById('speech-share-bar'), record.title, window.location.href);
+    }
+
+    // 編輯面板與一鍵延續至隔年
+    if (user) {
+      const editorSec = document.getElementById('speech-editor-section');
+      document.getElementById('btn-open-editor')?.addEventListener('click', () => {
+        editorSec.classList.toggle('hidden');
+        document.getElementById('ed-year').value = record?.year || defaultYear;
+        document.getElementById('ed-country').value = record?.country || defaultCountry;
+        document.getElementById('ed-title').value = record?.title || `${defaultYear} 年度演講紀錄`;
+        document.getElementById('ed-subtitle').value = record?.subtitle || '';
+        document.getElementById('ed-date').value = record?.event_date || '';
+        document.getElementById('ed-location').value = record?.location || '';
+        document.getElementById('ed-cover').value = record?.cover_image_url || '';
+        document.getElementById('ed-creator').value = record?.creator_name || '';
+        document.getElementById('ed-gallery').value = JSON.stringify(record?.gallery_items || [], null, 2);
+        document.getElementById('ed-overview').value = record?.overview_md || '';
+        document.getElementById('ed-committee').value = record?.committee_md || '';
+        document.getElementById('ed-staff').value = record?.staff_md || '';
+        document.getElementById('ed-subpages').value = JSON.stringify(record?.extra_subpages || [], null, 2);
+        editorSec.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      document.getElementById('ed-cancel')?.addEventListener('click', () => editorSec.classList.add('hidden'));
+
+      document.getElementById('speech-editor-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          const galleryItems = JSON.parse(document.getElementById('ed-gallery').value || '[]');
+          const extraSubpages = JSON.parse(document.getElementById('ed-subpages').value || '[]');
+          const saved = await saveSpeechPage({
+            id: record?.id,
+            year: document.getElementById('ed-year').value,
+            country: document.getElementById('ed-country').value,
+            title: document.getElementById('ed-title').value,
+            subtitle: document.getElementById('ed-subtitle').value,
+            event_date: document.getElementById('ed-date').value,
+            location: document.getElementById('ed-location').value,
+            cover_image_url: document.getElementById('ed-cover').value,
+            creator_name: document.getElementById('ed-creator').value,
+            gallery_items: galleryItems,
+            overview_md: document.getElementById('ed-overview').value,
+            committee_md: document.getElementById('ed-committee').value,
+            staff_md: document.getElementById('ed-staff').value,
+            extra_subpages: extraSubpages
+          });
+          window.location.href = `./competition.html?year=${saved.year}&country=${saved.country}`;
+        } catch (err) {
+          alert(`儲存失敗（請確認 JSON 格式正確）：${err.message}`);
+        }
+      });
+
+      document.getElementById('btn-clone-next')?.addEventListener('click', async () => {
+        if (!confirm(`確定要將本頁架構、委員會與子頁面延續至 ${Number(record.year) + 1} 年嗎？`)) return;
+        try {
+          const created = await cloneToNextYear(record);
+          window.location.href = `./competition.html?year=${created.year}&country=${created.country}`;
+        } catch (err) {
+          alert(`延續失敗：${err.message}`);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
