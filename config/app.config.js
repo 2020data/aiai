@@ -6,8 +6,8 @@ export const APP_CONFIG = {
   SITE_SUBTITLE: 'AI & Speech Curated Archive',
 
   // 1. Supabase 公開連線設定（Project Settings -> API）
-  SUPABASE_URL: 'https://YOUR_PROJECT_REF.supabase.co',
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_PUBLIC_KEY',
+  SUPABASE_URL: 'https://euvhpeygpgruyjojdsbf.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_1lTYfKRQf9HvjlT1ak5cVQ_6K_7JTn-',
 
   // 2. 全站預設語系（可一鍵修改：zh-TW / en / ms / ja / ko / zh-CN）
   DEFAULT_UI_LANG: 'zh-TW',
