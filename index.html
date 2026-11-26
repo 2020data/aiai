@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>數理與智識典藏 | Math &amp; AI Archive</title>
+  <meta name="description" content="數理與智識典藏：整合專題演講紀錄、AI 考照分享與數理推導筆記，支援完整 Markdown 與 LaTeX 數學公式渲染。" />
+
+  <!-- Google Fonts: Noto Serif TC, Noto Sans TC, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX CSS & JS (數學公式與符號渲染) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <!-- Marked.js (Markdown 解析) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ==================== 編輯部典藏色彩與字體系統 ==================== */
+    :root {
+      --bg-paper: #FAF8F4;
+      --bg-card: #FFFFFF;
+      --ink-primary: #1C1917;
+      --ink-secondary: #57534E;
+      --border-warm: #E5E0D8;
+      --accent-indigo: #1E3A5F;
+      --accent-bronze: #9A5B13;
+    }
+
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-serif-editorial {
+      font-family: 'Noto Serif TC', Georgia, 'Times New Roman', serif;
+    }
+
+    .font-mono-meta {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    /* ==================== 黃金比例卡片 (1.618 : 1) ==================== */
+    .golden-card {
+      aspect-ratio: 1.618 / 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-warm);
+      box-shadow: 0 2px 8px rgba(28, 25, 23, 0.04);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.3s ease;
+    }
+
+    .golden-card:hover {
+      transform: translateY(-3px);
+      border-color: #CFC6B8;
+      box-shadow: 0 18px 36px -12px rgba(28, 25, 23, 0.14);
+    }
+
+    /* ==================== Markdown + LaTeX 典藏排版樣式 ==================== */
+    .editorial-prose {
+      color: #292524;
+      line-height: 1.9;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+
+    .editorial-prose h1 {
+      font-family: 'Noto Serif TC', Georgia, serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #1C1917;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #E5E0D8;
+      line-height: 1.35;
+    }
+
+    .editorial-prose h2 {
+      font-family: 'Noto Serif TC', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #1E3A5F;
+      margin: 2rem 0 0.85rem;
+      line-height: 1.4;
+    }
+
+    .editorial-prose h3 {
+      font-family: 'Noto Serif TC', Georgia, serif;
+      font-size: 1.18rem;
+      font-weight: 600;
+      color: #1C1917;
+      margin: 1.5rem 0 0.65rem;
+    }
+
+    .editorial-prose h4 {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #9A5B13;
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .editorial-prose p {
+      margin: 0.9rem 0;
+    }
+
+    .editorial-prose strong {
+      color: #1C1917;
+      font-weight: 600;
+    }
+
+    .editorial-prose em {
+      color: #44403C;
+    }
+
+    .editorial-prose a {
+      color: #1E3A5F;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .editorial-prose a:hover {
+      color: #9A5B13;
+    }
+
+    .editorial-prose ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin: 0.9rem 0;
+    }
+
+    .editorial-prose ol {
+      list-style-type: decimal;
+      padding-left: 1.5rem;
+      margin: 0.9rem 0;
+    }
+
+    .editorial-prose li {
+      margin: 0.4rem 0;
+    }
+
+    .editorial-prose blockquote {
+      margin: 1.35rem 0;
+      padding: 0.95rem 1.25rem;
+      border-left: 3px solid #9A5B13;
+      background-color: #F6F2EA;
+      color: #44403C;
+      border-radius: 0 0.5rem 0.5rem 0;
+      font-size: 0.96rem;
+    }
+
+    .editorial-prose blockquote p {
+      margin: 0.3rem 0;
+    }
+
+    .editorial-prose hr {
+      border: 0;
+      border-top: 1px solid #E5E0D8;
+      margin: 2rem 0;
+    }
+
+    .editorial-prose code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86em;
+      background-color: #F2EEE6;
+      color: #1E3A5F;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.3rem;
+    }
+
+    .editorial-prose pre {
+      margin: 1.35rem 0;
+      padding: 1.15rem 1.3rem;
+      background-color: #1C1917;
+      color: #F5F2EB;
+      border-radius: 0.65rem;
+      overflow-x: auto;
+      border: 1px solid #292524;
+      line-height: 1.65;
+    }
+
+    .editorial-prose pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: 0.85rem;
+    }
+
+    .editorial-prose .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.4rem 0;
+      border: 1px solid #E5E0D8;
+      border-radius: 0.6rem;
+      background: #FFFFFF;
+    }
+
+    .editorial-prose table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    .editorial-prose th {
+      background-color: #F6F2EA;
+      color: #1C1917;
+      font-weight: 600;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #E5E0D8;
+    }
+
+    .editorial-prose td {
+      padding: 0.72rem 1rem;
+      border-bottom: 1px solid #F0ECE3;
+      vertical-align: top;
+    }
+
+    .editorial-prose tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* KaTeX 區塊公式容器 */
+    .katex-block-wrapper {
+      margin: 1.4rem 0;
+      padding: 1.1rem 1.25rem;
+      background-color: #FCFBF8;
+      border: 1px solid #ECE7DD;
+      border-radius: 0.6rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      text-align: center;
+    }
+
+    .katex-block-wrapper .katex-display {
+      margin: 0;
+    }
+
+    /* 細緻捲軸與微動畫 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F4F0E8;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D5CEC2;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B5AC9C;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeSlideIn 0.28s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex overflow-x-hidden selection:bg-amber-200/60 selection:text-stone-900">
+
+  <!-- ==================== 行動裝置抽屜遮罩 ==================== -->
+  <div id="mobileBackdrop" onclick="toggleMobileSidebar(false)"
+    class="fixed inset-0 z-40 bg-stone-950/45 backdrop-blur-[2px] hidden lg:hidden transition-opacity"></div>
+
+  <!-- ==================== 左側固定側邊欄位 (Sidebar) ==================== -->
+  <aside id="sidebarDrawer"
+    class="fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-72 shrink-0 bg-[#F5F2EB] border-r border-[#E5E0D8] flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out">
+
+    <!-- 1. 品牌標題與簡介 -->
+    <div class="px-6 pt-6 pb-5 border-b border-[#E5E0D8]">
+      <div class="flex items-start justify-between gap-2">
+        <button type="button" onclick="selectAllArticles()" class="text-left group">
+          <div class="flex items-center gap-2.5 mb-2">
+            <span class="w-8 h-8 rounded-lg bg-[#1E3A5F] text-[#FAF8F4] flex items-center justify-center font-serif-editorial font-bold text-base shadow-sm group-hover:bg-[#9A5B13] transition-colors">
+              數
+            </span>
+            <span class="font-mono-meta text-[10px] uppercase tracking-[0.2em] text-[#9A5B13] font-semibold">
+              MATH &amp; AI ARCHIVE
+            </span>
+          </div>
+          <h1 class="font-serif-editorial text-xl font-bold text-[#1C1917] tracking-tight leading-snug">
+            數理與智識典藏
+          </h1>
+        </button>
+
+        <button type="button" onclick="toggleMobileSidebar(false)"
+          class="lg:hidden p-1.5 rounded-lg text-stone-500 hover:bg-stone-200/70" aria-label="關閉側邊欄">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-stone-500 leading-relaxed mt-2">
+        收錄數理推導筆記、人工智慧理論、iPAS 考照解析與專題演講紀實。
+      </p>
+
+      <!-- 2. 即時關鍵字搜尋框 -->
+      <div class="relative mt-4">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <input id="sidebarSearchInput" type="text" placeholder="搜尋標題、公式或筆記..."
+          class="w-full pl-8 pr-8 py-2 text-xs bg-white border border-[#E5E0D8] rounded-lg text-stone-800 placeholder:text-stone-400 focus:outline-none focus:border-[#1E3A5F] transition" />
+        <button id="clearSearchBtn" type="button" onclick="clearSearch()"
+          class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. 階層式分類導覽 (大分類 + 小分類) -->
+    <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      <!-- 全部典藏按鈕 -->
+      <button id="allArticlesBtn" type="button" onclick="selectAllArticles()"
+        class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition">
+        <span class="inline-flex items-center gap-2.5">
+          <i data-lucide="library" class="w-4 h-4"></i>
+          <span>全部典藏</span>
+        </span>
+        <span id="allCountBadge" class="font-mono-meta text-xs px-2 py-0.5 rounded-full">0</span>
+      </button>
+
+      <div class="pt-1">
+        <div class="px-2 pb-2 flex items-center justify-between">
+          <span class="font-mono-meta text-[10px] uppercase tracking-[0.18em] text-stone-400 font-semibold">
+            CATEGORIES / 階層分類
+          </span>
+        </div>
+        <!-- 大分類與小分類按鈕樹 -->
+        <nav id="categoryTreeNav" class="space-y-1.5"></nav>
+      </div>
+    </div>
+
+    <!-- 4. 側邊欄底部管理操作區 -->
+    <div class="p-4 border-t border-[#E5E0D8] bg-[#EFEBE2]/70 space-y-2">
+      <button type="button" onclick="openEditorModal()"
+        class="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition shadow-sm">
+        <i data-lucide="pen-line" class="w-3.5 h-3.5"></i>
+        <span>新增筆記 / 推導文章</span>
+      </button>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="openCategoryModal()"
+          class="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-[#E5E0D8] text-xs font-medium transition">
+          <i data-lucide="folder-tree" class="w-3.5 h-3.5 text-[#9A5B13]"></i>
+          <span>分類管理</span>
+        </button>
+        <button type="button" onclick="openBackupModal()"
+          class="flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-[#E5E0D8] text-xs font-medium transition">
+          <i data-lucide="hard-drive-download" class="w-3.5 h-3.5 text-[#1E3A5F]"></i>
+          <span>JSON 備份</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== 右側主內容區 ==================== -->
+  <div class="flex-1 min-w-0 flex flex-col min-h-screen">
+
+    <!-- 行動裝置頂部導覽列 -->
+    <header class="lg:hidden sticky top-0 z-30 h-14 px-4 bg-[#FAF8F4]/95 backdrop-blur-md border-b border-[#E5E0D8] flex items-center justify-between gap-3">
+      <button type="button" onclick="toggleMobileSidebar(true)"
+        class="p-2 -ml-2 rounded-lg text-stone-700 hover:bg-stone-200/70 flex items-center gap-2">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+        <span class="font-serif-editorial font-semibold text-base text-stone-900">數理與智識典藏</span>
+      </button>
+      <button type="button" onclick="openEditorModal()"
+        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#1E3A5F] text-white text-xs font-medium">
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i>新增
+      </button>
+    </header>
+
+    <!-- 檢視 A：黃金比例卡片網格列表 (Grid View) -->
+    <main id="gridView" class="flex-1 w-full max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-8 sm:py-10">
+      <!-- 頂部分類麵包屑與篇數統計 -->
+      <div class="flex flex-wrap items-end justify-between gap-4 pb-6 mb-8 border-b border-[#E5E0D8]">
+        <div class="space-y-1.5">
+          <div id="breadcrumbTrail" class="flex items-center flex-wrap gap-1.5 font-mono-meta text-[11px] uppercase tracking-[0.14em] text-[#9A5B13]">
+            <span>ARCHIVE</span>
+          </div>
+          <h2 id="viewHeading" class="font-serif-editorial text-2xl sm:text-3xl font-bold text-[#1C1917] tracking-tight">
+            全部典藏
+          </h2>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span id="articleCountMeta" class="font-mono-meta text-xs text-stone-500 bg-white px-3 py-1.5 rounded-full border border-[#E5E0D8]">
+            共 0 篇典藏
+          </span>
+        </div>
+      </div>
+
+      <!-- 黃金比例卡片網格 (1.618:1) -->
+      <div id="goldenCardGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
+        <!-- 由 JS 動態渲染 -->
+      </div>
+    </main>
+
+    <!-- 檢視 B：典藏閱讀頁 (Reading View - Markdown + LaTeX) -->
+    <article id="readerView" class="hidden flex-1 w-full max-w-4xl mx-auto px-5 sm:px-8 py-8 sm:py-10 animate-fade-in">
+      <!-- 閱讀頁頂部工具列 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-5 mb-7 border-b border-[#E5E0D8]">
+        <button type="button" onclick="closeReaderView()"
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-[#E5E0D8] text-xs sm:text-sm font-medium transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>返回典藏列表</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button id="readerEditBtn" type="button"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            <span>編輯筆記</span>
+          </button>
+          <button id="readerDeleteBtn" type="button"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-xs font-medium transition">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>刪除</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 文章標頭與封面 -->
+      <div id="readerHeader" class="space-y-5 mb-8"></div>
+
+      <!-- 演講 / 資源資訊條（若文章有填寫則顯示） -->
+      <div id="readerMetaBar" class="hidden mb-8"></div>
+
+      <!-- Markdown + KaTeX 渲染正文 -->
+      <div class="bg-white border border-[#E5E0D8] rounded-xl p-6 sm:p-10 shadow-sm">
+        <div id="readerProseBody" class="editorial-prose"></div>
+      </div>
+    </article>
+
+    <!-- 頁尾 -->
+    <footer class="mt-auto border-t border-[#E5E0D8] bg-[#FAF8F4]">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-400">
+        <span class="font-serif-editorial text-stone-600">數理與智識典藏 · Math &amp; AI Archive</span>
+        <span class="font-mono-meta text-[11px]">Golden Ratio 1.618:1 · Markdown + KaTeX Engine</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================== Modal 1: 雙欄即時預覽編輯器 ==================== -->
+  <div id="editorModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-stone-950/60 backdrop-blur-sm">
+    <div class="bg-[#FAF8F4] border border-[#D8D2C5] rounded-xl w-full max-w-6xl h-[93vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in">
+      <!-- 頂部列 -->
+      <div class="px-5 py-3.5 bg-white border-b border-[#E5E0D8] flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="font-mono-meta text-[10px] uppercase tracking-[0.18em] px-2 py-0.5 rounded bg-[#1E3A5F] text-white">EDITOR</span>
+          <h3 id="editorModalTitle" class="font-serif-editorial text-lg font-bold text-stone-900">新增數理與智識筆記</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeModal('editorModal')"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-100">取消</button>
+          <button type="button" onclick="saveArticleFromEditor()"
+            class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition shadow-sm">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i>儲存筆記
+          </button>
+        </div>
+      </div>
+
+      <!-- 文章基本設定列 -->
+      <div class="px-5 py-3.5 bg-[#F6F3EC] border-b border-[#E5E0D8] space-y-3 shrink-0 overflow-y-auto max-h-[34vh]">
+        <input type="hidden" id="editArticleId" />
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-5">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">文章標題 *</label>
+            <input id="editTitle" type="text" placeholder="例如：貝氏定理與最大後驗估計 (MAP) 推導"
+              class="w-full px-3 py-1.5 text-sm bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          </div>
+          <div class="md:col-span-3">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">大分類 *</label>
+            <select id="editMajorCat" onchange="syncMinorCatDropdown()"
+              class="w-full px-3 py-1.5 text-sm bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]"></select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">小分類 *</label>
+            <select id="editMinorCat"
+              class="w-full px-3 py-1.5 text-sm bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]"></select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">發布日期</label>
+            <input id="editDate" type="date"
+              class="w-full px-2.5 py-1.5 text-sm bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          </div>
+        </div>
+
+        <!-- 封面照片設定 + 演講/資源選填切換 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+          <div class="md:col-span-5">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">封面圖片網址 (黃金比例 1.618:1)</label>
+            <input id="editCoverUrl" type="url" placeholder="https://images.unsplash.com/..."
+              class="w-full px-3 py-1.5 text-xs bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          </div>
+          <div class="md:col-span-4">
+            <label class="block font-mono-meta text-[10px] uppercase tracking-wider text-stone-500 mb-1">或上傳本地封面照片 (自動壓縮)</label>
+            <input id="editCoverFile" type="file" accept="image/*" onchange="handleCoverUpload(event)"
+              class="w-full text-xs text-stone-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border file:border-[#D8D2C5] file:text-xs file:bg-white file:text-stone-700 hover:file:bg-stone-100" />
+          </div>
+          <div class="md:col-span-3 flex justify-end">
+            <button type="button" onclick="toggleExtraMetaFields()"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 border border-[#D8D2C5] text-xs text-stone-700 transition">
+              <i data-lucide="calendar-plus" class="w-3.5 h-3.5 text-[#9A5B13]"></i>
+              <span id="extraMetaToggleText">展開演講 / 資源欄位</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 選填：演講資訊與投影片／題庫連結 -->
+        <div id="extraMetaFields" class="hidden pt-2 border-t border-[#E5E0D8] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+          <input id="editEventTime" type="text" placeholder="演講日期與時間（選填）"
+            class="px-3 py-1.5 text-xs bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          <input id="editEventLocation" type="text" placeholder="演講地點（選填）"
+            class="px-3 py-1.5 text-xs bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          <input id="editSlidesUrl" type="url" placeholder="投影片連結 https://..."
+            class="px-3 py-1.5 text-xs bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+          <input id="editQuizUrl" type="url" placeholder="題庫 / 外部資源連結 https://..."
+            class="px-3 py-1.5 text-xs bg-white border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+        </div>
+      </div>
+
+      <!-- 數學符號快捷插入工具列 -->
+      <div class="px-5 py-2 bg-white border-b border-[#E5E0D8] flex items-center gap-1.5 overflow-x-auto shrink-0">
+        <span class="font-mono-meta text-[10px] uppercase tracking-wider text-stone-400 mr-1 shrink-0">LaTeX 快捷:</span>
+        <button type="button" onclick="insertSnippet('$$\n', '\n$$', 'E = mc^2')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-[#1E3A5F] shrink-0">區塊 $$</button>
+        <button type="button" onclick="insertSnippet('$', '$', '\\theta')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-[#1E3A5F] shrink-0">行內 $</button>
+        <button type="button" onclick="insertSnippet('\\int_{a}^{b} ', '\\,dx', 'f(x)')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">積分 ∫</button>
+        <button type="button" onclick="insertSnippet('\\sum_{i=1}^{n} ', '', 'x_i')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">總和 ∑</button>
+        <button type="button" onclick="insertSnippet('\\nabla ', '', 'L(\\theta)')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">梯度 ∇</button>
+        <button type="button" onclick="insertSnippet('\\frac{\\partial ', '}{\\partial x}', 'f')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">偏微分 ∂</button>
+        <button type="button" onclick="insertSnippet('\\frac{', '}{b}', 'a')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">分數 \frac</button>
+        <button type="button" onclick="insertSnippet('\\begin{bmatrix}\n  a & b \\\\\n  c & d\n\\end{bmatrix}', '', '')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">矩陣</button>
+        <button type="button" onclick="insertSnippet('$$\n\\begin{aligned}\n  y &= ax + b \\\\\n    &= c\n\\end{aligned}\n$$', '', '')" class="px-2.5 py-1 rounded bg-[#F5F2EB] hover:bg-[#E8E2D5] text-xs font-mono-meta text-stone-700 shrink-0">多行對齊</button>
+      </div>
+
+      <!-- 雙欄主體：左原始碼 / 右即時預覽 -->
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-0 divide-y lg:divide-y-0 lg:divide-x divide-[#E5E0D8]">
+        <!-- 左欄：Markdown + LaTeX 原始碼 -->
+        <div class="flex flex-col min-h-0 bg-white">
+          <div class="px-4 py-1.5 bg-[#FAF8F4] border-b border-[#ECE7DD] font-mono-meta text-[10px] uppercase tracking-widest text-stone-400">
+            MARKDOWN + LATEX SOURCE
+          </div>
+          <textarea id="editMarkdownInput" oninput="updateLivePreview()" placeholder="請輸入 Markdown 與 LaTeX 內容...&#10;&#10;行內公式範例：$f(x) = x^2$&#10;區塊公式範例：&#10;$$&#10;\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}&#10;$$"
+            class="flex-1 w-full p-4 sm:p-5 text-sm font-mono-meta text-stone-800 bg-white resize-none focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- 右欄：即時渲染預覽 -->
+        <div class="flex flex-col min-h-0 bg-[#FAF8F4]">
+          <div class="px-4 py-1.5 bg-[#F5F2EB] border-b border-[#ECE7DD] font-mono-meta text-[10px] uppercase tracking-widest text-[#9A5B13]">
+            LIVE EDITORIAL PREVIEW
+          </div>
+          <div id="livePreviewPane" class="flex-1 overflow-y-auto p-5 sm:p-6 bg-white">
+            <div id="livePreviewContent" class="editorial-prose"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== Modal 2: 分類管理 (大分類 & 小分類) ==================== -->
+  <div id="categoryModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-stone-950/60 backdrop-blur-sm">
+    <div class="bg-[#FAF8F4] border border-[#D8D2C5] rounded-xl w-full max-w-2xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-fade-in">
+      <div class="px-6 py-4 bg-white border-b border-[#E5E0D8] flex items-center justify-between shrink-0">
+        <div>
+          <span class="font-mono-meta text-[10px] uppercase tracking-[0.18em] text-[#9A5B13]">TAXONOMY MANAGER</span>
+          <h3 class="font-serif-editorial text-xl font-bold text-stone-900">大分類與小分類管理</h3>
+        </div>
+        <button type="button" onclick="closeModal('categoryModal')" class="p-1.5 rounded-lg hover:bg-stone-100 text-stone-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <!-- 新增一個大分類 -->
+        <form onsubmit="handleAddMajorCategory(event)" class="p-4 rounded-lg bg-white border border-[#E5E0D8] space-y-3">
+          <div class="font-serif-editorial font-semibold text-sm text-stone-900">新增大分類</div>
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input id="newMajorName" type="text" required placeholder="輸入大分類名稱（例如：量子計算與物理）"
+              class="flex-1 px-3 py-2 text-sm bg-[#FAF8F4] border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+            <select id="newMajorIcon" class="px-3 py-2 text-sm bg-[#FAF8F4] border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]">
+              <option value="cpu">AI / 運算 (Cpu)</option>
+              <option value="sigma">數學 / 推導 (Sigma)</option>
+              <option value="presentation">演講 / 實務 (Slides)</option>
+              <option value="book-open">書籍 / 筆記 (Book)</option>
+              <option value="flask-conical">研究 / 實驗 (Flask)</option>
+            </select>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition shrink-0">
+              新增大分類
+            </button>
+          </div>
+        </form>
+
+        <!-- 現有分類樹編輯列表 -->
+        <div id="categoryManagerList" class="space-y-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== Modal 3: JSON 備份與還原 ==================== -->
+  <div id="backupModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-stone-950/60 backdrop-blur-sm">
+    <div class="bg-[#FAF8F4] border border-[#D8D2C5] rounded-xl w-full max-w-md p-6 shadow-2xl space-y-5 animate-fade-in">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="font-mono-meta text-[10px] uppercase tracking-[0.18em] text-[#9A5B13]">LOCAL STORAGE BACKUP</span>
+          <h3 class="font-serif-editorial text-xl font-bold text-stone-900 mt-0.5">匯出與匯入 JSON 備份</h3>
+        </div>
+        <button type="button" onclick="closeModal('backupModal')" class="p-1.5 rounded-lg hover:bg-stone-200/70 text-stone-500">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-stone-600 leading-relaxed">
+        所有筆記、大／小分類設定與上傳照片均自動儲存於瀏覽器 <code class="font-mono-meta text-[#1E3A5F]">localStorage</code>。您可隨時匯出 JSON 檔案保存，或從備份檔完整還原。
+      </p>
+
+      <div class="space-y-2.5">
+        <button type="button" onclick="exportBackupJson()"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-sm font-medium transition">
+          <i data-lucide="download" class="w-4 h-4"></i>匯出完整 JSON 備份
+        </button>
+
+        <label class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-stone-100 text-stone-800 border border-[#D8D2C5] text-sm font-medium transition cursor-pointer">
+          <i data-lucide="upload" class="w-4 h-4 text-[#9A5B13]"></i>
+          <span>選擇 JSON 檔案匯入還原</span>
+          <input type="file" accept=".json,application/json" onchange="importBackupJson(event)" class="hidden" />
+        </label>
+
+        <button type="button" onclick="requestResetDefaultData()"
+          class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs text-stone-500 hover:text-rose-700 hover:bg-rose-50 transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>恢復預設 6 篇範例文章與分類
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== Modal 4: 自訂確認對話框 (取代 confirm) ==================== -->
+  <div id="confirmModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-stone-950/60 backdrop-blur-sm">
+    <div class="bg-[#FAF8F4] border border-[#D8D2C5] rounded-xl w-full max-w-sm p-6 shadow-2xl animate-fade-in">
+      <h3 id="confirmTitle" class="font-serif-editorial text-lg font-bold text-stone-900">確認操作</h3>
+      <p id="confirmMessage" class="text-sm text-stone-600 mt-2 leading-relaxed"></p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" onclick="closeModal('confirmModal')"
+          class="px-4 py-1.5 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-200/70">取消</button>
+        <button id="confirmOkBtn" type="button"
+          class="px-4 py-1.5 rounded-lg text-xs font-medium bg-rose-700 hover:bg-rose-800 text-white">確定執行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 通知容器 -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[80] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- ==================== 核心應用程式腳本 ==================== -->
+  <script>
+    // ==================== 1. 預設分類樹與 6 篇高質感範例文章 ====================
+    const STORAGE_KEY = 'math_ai_archive_v2_data';
+
+    const DEFAULT_CATEGORIES = [
+      {
+        id: 'ai-cert',
+        name: '人工智慧與考照',
+        icon: 'cpu',
+        subcategories: ['iPAS AI 考照', '大型語言模型', '機器學習理論']
+      },
+      {
+        id: 'math-notes',
+        name: '數理推導與筆記',
+        icon: 'sigma',
+        subcategories: ['線性代數', '微積分與最佳化', '機率與統計']
+      },
+      {
+        id: 'lectures',
+        name: '專題演講與實務',
+        icon: 'presentation',
+        subcategories: ['校園講座', '企業內訓與題庫']
+      }
+    ];
+
+    const DEFAULT_ARTICLES = [
+      {
+        id: 'art-transformer',
+        title: 'Transformer 注意力機制與矩陣推導',
+        majorCategoryId: 'ai-cert',
+        minorCategory: '大型語言模型',
+        date: '2026-11-22',
+        coverImage: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1000&q=80',
+        content: `## 核心概念：為什麼需要自注意力機制？
+
+傳統循環神經網路（RNN / LSTM）必須循序計算隱藏狀態，難以平行化且容易遺忘長距離語境。**Transformer** 透過 **Scaled Dot-Product Attention** 直接在任意兩個 Token 之間建立關聯矩陣，實現全域依賴建模。
+
+---
+
+## Scaled Dot-Product Attention 推導
+
+給定輸入序列矩陣 $X \\in \\mathbb{R}^{n \\times d_{\\text{model}}}$，透過三組可學習的線性投影矩陣 $W^Q, W^K, W^V$ 計算查詢（Query）、鍵（Key）與值（Value）：
+
+$$
+Q = X W^Q, \\quad K = X W^K, \\quad V = X W^V
+$$
+
+注意力權重與輸出矩陣定義為：
+
+$$
+\\operatorname{Attention}(Q, K, V) = \\operatorname{softmax}\\!\\left(\\frac{Q K^\\top}{\\sqrt{d_k}}\\right) V
+$$
+
+> **為何要除以 $\\sqrt{d_k}$？**
+> 假設 $q_i, k_i$ 各自獨立且滿足均值 $0$、變異數 $1$，則內積 $q \\cdot k = \\sum_{i=1}^{d_k} q_i k_i$ 的變異數為 $d_k$。當維度 $d_k$ 很大時，內積值會落入 $\\operatorname{softmax}$ 梯度趨近於 $0$ 的飽和區；除以 $\\sqrt{d_k}$ 可將變異數重新歸一化為 $1$，確保反向傳播梯度穩定。
+
+---
+
+## Multi-Head Attention 多頭注意力架構
+
+為了讓模型同時在不同表示子空間（Representation Subspaces）捕捉語法與語意關聯，將注意力拆分為 $h$ 個頭並串接：
+
+$$
+\\begin{aligned}
+\\operatorname{MultiHead}(Q, K, V) &= \\operatorname{Concat}(\\text{head}_1, \\dots, \\text{head}_h) W^O \\\\
+\\text{where}\\quad \\text{head}_i &= \\operatorname{Attention}(Q W_i^Q,\\; K W_i^K,\\; V W_i^V)
+\\end{aligned}
+$$
+
+### 常見模型張量維度對照表
+
+| 符號 | 數學維度 | 實務意義 |
+| :--- | :--- | :--- |
+| $X$ | $\\mathbb{R}^{n \\times d_{\\text{model}}}$ | 輸入詞嵌入序列（長度 $n$） |
+| $Q, K$ | $\\mathbb{R}^{n \\times d_k}$ | 單頭查詢與鍵矩陣，$d_k = d_{\\text{model}} / h$ |
+| $Q K^\\top$ | $\\mathbb{R}^{n \\times n}$ | 序列對序列的原始相似度分數矩陣 |
+| $W^O$ | $\\mathbb{R}^{h d_v \\times d_{\\text{model}}}$ | 多頭合併後的線性輸出投影矩陣 |
+
+### PyTorch 精簡實作片段
+
+\`\`\`python
+import math
+import torch
+import torch.nn.functional as F
+
+def scaled_dot_product_attention(Q, K, V, mask=None):
+    d_k = Q.size(-1)
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)
+    if mask is not None:
+        scores = scores.masked_fill(mask == 0, float('-inf'))
+    weights = F.softmax(scores, dim=-1)
+    return torch.matmul(weights, V), weights
+\`\`\`
+`
+      },
+      {
+        id: 'art-ipas-gd',
+        title: 'iPAS AI 應用規劃師：梯度下降與損失函數全解析',
+        majorCategoryId: 'ai-cert',
+        minorCategory: 'iPAS AI 考照',
+        date: '2026-11-18',
+        coverImage: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1000&q=80',
+        content: `## 考照核心命題導覽
+
+在經濟部 **iPAS AI 應用規劃師**「人工智慧基礎概論」考科中，模型訓練的核心機制——**損失函數（Loss Function）** 與 **梯度下降法（Gradient Descent）**——屬於最高頻必考觀念。
+
+---
+
+## 兩大核心損失函數
+
+### 1. 均方誤差（MSE，迴歸任務）
+
+衡量連續預測值 $\\hat{y}_i$ 與真實標籤 $y_i$ 之間的平方誤差平均：
+
+$$
+\\mathcal{L}_{\\text{MSE}}(\\theta) = \\frac{1}{N} \\sum_{i=1}^{N} \\left( y_i - \\hat{y}_i \\right)^2
+$$
+
+### 2. 交叉熵損失（Cross-Entropy，分類任務）
+
+在二元分類中，若預測正類機率為 $\\hat{p}_i = \\sigma(z_i)$，二元交叉熵（BCE）定義為：
+
+$$
+\\mathcal{L}_{\\text{BCE}}(\\theta) = -\\frac{1}{N} \\sum_{i=1}^{N} \\Big[ y_i \\ln(\\hat{p}_i) + (1 - y_i) \\ln(1 - \\hat{p}_i) \\Big]
+$$
+
+多類別分類（共 $C$ 類）則推廣為：
+
+$$
+\\mathcal{L}_{\\text{CE}} = -\\sum_{c=1}^{C} y_c \\ln \\hat{p}_c
+$$
+
+---
+
+## 梯度下降與參數更新法則
+
+最佳化目標為尋找使損失函數最小化的參數 $\\theta^*$。在每一輪疊代 $t$ 中，沿著負梯度方向更新參數：
+
+$$
+\\theta_{t+1} = \\theta_t - \\eta \\nabla_{\\theta} \\mathcal{L}(\\theta_t)
+$$
+
+其中 $\\eta > 0$ 為**學習率（Learning Rate）**。若進一步加入動量（Momentum）與自適應學習率（如 Adam）：
+
+$$
+\\begin{aligned}
+m_t &= \\beta_1 m_{t-1} + (1 - \\beta_1) g_t \\\\
+v_t &= \\beta_2 v_{t-1} + (1 - \\beta_2) g_t^2 \\\\
+\\theta_{t+1} &= \\theta_t - \\frac{\\eta}{\\sqrt{\\hat{v}_t} + \\epsilon} \\hat{m}_t
+\\end{aligned}
+$$
+
+### 常見最佳化器考點比較
+
+| 最佳化方法 | 單步計算量 | 收斂特性與考題關鍵字 |
+| :--- | :--- | :--- |
+| **Batch GD** | 全部 $N$ 筆資料 | 方向穩定，但大數據集記憶體消耗過高 |
+| **SGD** | 隨機單筆資料 | 具雜訊可跳脫局部極小值，震盪較明顯 |
+| **Mini-batch GD** | 批次 $B$ 筆（如 32/64） | 兼顧 GPU 向量化加速與收斂平滑度 |
+| **Adam** | 批次 $B$ 筆 | 結合一階動量與二階自適應縮放，實務首選 |
+
+> **考前速記口訣**：迴歸看 **MSE / MAE**，分類看 **Cross-Entropy**；學習率過大會導致發散震盪，過小則收斂緩慢甚至陷入鞍點。
+`
+      },
+      {
+        id: 'art-svd-pca',
+        title: '奇異值分解 (SVD) 與主成分分析幾何直覺',
+        majorCategoryId: 'math-notes',
+        minorCategory: '線性代數',
+        date: '2026-11-12',
+        coverImage: 'https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?auto=format&fit=crop&w=1000&q=80',
+        content: `## 奇異值分解的幾何本質
+
+任意實矩陣 $A \\in \\mathbb{R}^{m \\times n}$ 皆可分解為三次基本線性變換的複合：**旋轉（$V^\\top$）→ 沿座標軸伸縮（$\\Sigma$）→ 再次旋轉（$U$）**：
+
+$$
+A = U \\Sigma V^\\top = \\sum_{i=1}^{r} \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top
+$$
+
+其中：
+- $U \\in \\mathbb{R}^{m \\times m}$ 為左奇異向量構成的正交矩陣（$U^\\top U = I_m$）。
+- $V \\in \\mathbb{R}^{n \\times n}$ 為右奇異向量構成的正交矩陣（$V^\\top V = I_n$）。
+- $\\Sigma \\in \\mathbb{R}^{m \\times n}$ 為非負對角矩陣，奇異值依序遞減：$\\sigma_1 \\ge \\sigma_2 \\ge \\dots \\ge \\sigma_r > 0$。
+
+---
+
+## 低秩近似與 Eckart–Young 定理
+
+若僅保留前 $k$ 個最大奇異值構成秩為 $k$ 的矩陣 $A_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$，則 $A_k$ 在 Frobenius 範數下是所有秩不超過 $k$ 之矩陣中的最佳近似：
+
+$$
+\\min_{\\operatorname{rank}(B) \\le k} \\| A - B \\|_F = \\| A - A_k \\|_F = \\sqrt{\\sum_{i=k+1}^{r} \\sigma_i^2}
+$$
+
+這正是 **影像壓縮、推薦系統矩陣補全** 與 **LoRA 低秩微調** 的數理基石。
+
+---
+
+## SVD 與主成分分析 (PCA) 的等價連結
+
+設資料矩陣 $X \\in \\mathbb{R}^{N \\times d}$ 已完成欄位零均值化（Zero-centered），其樣本共變異數矩陣為：
+
+$$
+C = \\frac{1}{N - 1} X^\\top X
+$$
+
+將 $X = U \\Sigma V^\\top$ 代入上式：
+
+$$
+\\begin{aligned}
+C &= \\frac{1}{N - 1} (V \\Sigma^\\top U^\\top)(U \\Sigma V^\\top) \\\\
+  &= V \\left( \\frac{\\Sigma^\\top \\Sigma}{N - 1} \\right) V^\\top
+\\end{aligned}
+$$
+
+由此直接得出三個關鍵結論：
+1. **主成分方向**：$X$ 的右奇異向量 $\\mathbf{v}_j$ 即為共變異數矩陣 $C$ 的特徵向量。
+2. **解釋變異量**：第 $j$ 個主成分對應的特徵值為 $\\lambda_j = \\frac{\\sigma_j^2}{N - 1}$。
+3. **數值穩定性**：直接對 $X$ 執行 SVD 可避免顯式計算 $X^\\top X$ 所造成的條件數平方（$\\kappa(X^\\top X) = \\kappa(X)^2$）精度損失。
+`
+      },
+      {
+        id: 'art-bayes-map',
+        title: '貝氏定理與最大後驗估計 (MAP) 推導',
+        majorCategoryId: 'math-notes',
+        minorCategory: '機率與統計',
+        date: '2026-11-05',
+        coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1000&q=80',
+        content: `## 從貝氏定理看參數估計
+
+在統計推論與機器學習中，給定觀測資料集 $\\mathcal{D} = \\{(x_i, y_i)\\}_{i=1}^N$，模型參數 $\\theta$ 的後驗機率分佈由貝氏定理給出：
+
+$$
+P(\\theta \\mid \\mathcal{D}) = \\frac{P(\\mathcal{D} \\mid \\theta)\\, P(\\theta)}{P(\\mathcal{D})}
+$$
+
+- $P(\\mathcal{D} \\mid \\theta)$：**概似函數（Likelihood）**，衡量參數解釋資料的程度。
+- $P(\\theta)$：**先驗分佈（Prior）**，代表觀測資料前對參數的領域知識或偏好。
+- $P(\\theta \\mid \\mathcal{D})$：**後驗分佈（Posterior）**。
+
+---
+
+## MLE 與 MAP 的數學差異
+
+由於邊際機率 $P(\\mathcal{D})$ 與參數 $\\theta$ 無關，**最大後驗估計（MAP）** 取對數後可寫為：
+
+$$
+\\begin{aligned}
+\\hat{\\theta}_{\\text{MAP}} &= \\arg\\max_{\\theta} \\; P(\\mathcal{D} \\mid \\theta) P(\\theta) \\\\
+&= \\arg\\max_{\\theta} \\; \\Big[ \\ln P(\\mathcal{D} \\mid \\theta) + \\ln P(\\theta) \\Big]
+\\end{aligned}
+$$
+
+當先驗分佈為均勻分佈（無偏好資訊）時，MAP 即退化為**最大概似估計（MLE）**：$\\hat{\\theta}_{\\text{MLE}} = \\arg\\max_{\\theta} \\ln P(\\mathcal{D} \\mid \\theta)$。
+
+---
+
+## 定理證明：高斯先驗等價於 L2 正則化 (Ridge)
+
+假設線性迴歸模型的雜訊服從高斯分佈 $y_i \\mid x_i, \\mathbf{w} \\sim \\mathcal{N}(\\mathbf{w}^\\top x_i, \\sigma^2)$，且權重先驗服從零均值高斯分佈 $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, \\tau^2 I)$：
+
+$$
+\\begin{aligned}
+\\hat{\\mathbf{w}}_{\\text{MAP}}
+&= \\arg\\min_{\\mathbf{w}} \\left[ -\\sum_{i=1}^{N} \\ln \\mathcal{N}(y_i \\mid \\mathbf{w}^\\top x_i, \\sigma^2) - \\ln \\mathcal{N}(\\mathbf{w} \\mid \\mathbf{0}, \\tau^2 I) \\right] \\\\
+&= \\arg\\min_{\\mathbf{w}} \\left[ \\frac{1}{2\\sigma^2} \\sum_{i=1}^{N} (y_i - \\mathbf{w}^\\top x_i)^2 + \\frac{1}{2\\tau^2} \\|\\mathbf{w}\\|_2^2 \\right] \\\\
+&= \\arg\\min_{\\mathbf{w}} \\left[ \\sum_{i=1}^{N} (y_i - \\mathbf{w}^\\top x_i)^2 + \\lambda \\|\\mathbf{w}\\|_2^2 \\right], \\quad \\lambda = \\frac{\\sigma^2}{\\tau^2}
+\\end{aligned}
+$$
+
+> **核心洞見**：若將先驗改為 **拉普拉斯分佈（Laplace Prior）** $P(\\mathbf{w}) \\propto \\exp(-\\frac{\\|\\mathbf{w}\\|_1}{b})$，同樣推導步驟即可證明其等價於 **L1 正則化（Lasso）**，從而自然產生稀疏權重解。
+`
+      },
+      {
+        id: 'art-gaussian-integral',
+        title: '高斯積分與常態分佈歸一化證明',
+        majorCategoryId: 'math-notes',
+        minorCategory: '微積分與最佳化',
+        date: '2026-10-26',
+        coverImage: 'https://images.unsplash.com/photo-1635070041409-e63e783ce3c1?auto=format&fit=crop&w=1000&q=80',
+        content: `## 經典難題：高斯積分的初等原函數不存在
+
+函數 $f(x) = e^{-x^2}$ 沒有以初等函數表示的不定積分，然而其全實數軸上的廣義定積分卻具有極為優美的閉合解：
+
+$$
+I = \\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}
+$$
+
+---
+
+## 極座標雙重積分證明（Poisson 技巧）
+
+將積分 $I$ 平方，並利用 Fubini 定理轉換為二維平面 $\\mathbb{R}^2$ 上的雙重積分：
+
+$$
+\\begin{aligned}
+I^2 &= \\left( \\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx \\right) \\left( \\int_{-\\infty}^{\\infty} e^{-y^2}\\,dy \\right) \\\\
+    &= \\iint_{\\mathbb{R}^2} e^{-(x^2 + y^2)}\\,dx\\,dy
+\\end{aligned}
+$$
+
+引入極座標變換 $x = r\\cos\\theta,\\; y = r\\sin\\theta$，其 Jacobian 行列式為 $r$，面積微元 $dx\\,dy = r\\,dr\\,d\\theta$：
+
+$$
+\\begin{aligned}
+I^2 &= \\int_{0}^{2\\pi} \\int_{0}^{\\infty} e^{-r^2} \\cdot r\\,dr\\,d\\theta \\\\
+    &= 2\\pi \\left[ -\\frac{1}{2} e^{-r^2} \\right]_{0}^{\\infty} \\\\
+    &= 2\\pi \\left( 0 - \\left(-\\frac{1}{2}\\right) \\right) = \\pi
+\\end{aligned}
+$$
+
+由於被積函數恆正（$e^{-x^2} > 0$），取正平方根即得證：$I = \\sqrt{\\pi}$。
+
+---
+
+## 推論：常態分佈機率密度函數的歸一化
+
+考慮一般常態分佈 $\\mathcal{N}(\\mu, \\sigma^2)$ 之密度函數：
+
+$$
+p(x) = \\frac{1}{\\sqrt{2\\pi}\\,\\sigma} \\exp\\!\\left( -\\frac{(x - \\mu)^2}{2\\sigma^2} \\right)
+$$
+
+令變數代換 $u = \\frac{x - \\mu}{\\sqrt{2}\\,\\sigma}$，則 $dx = \\sqrt{2}\\,\\sigma\\,du$，驗證總機率為 $1$：
+
+$$
+\\int_{-\\infty}^{\\infty} p(x)\\,dx = \\frac{1}{\\sqrt{2\\pi}\\,\\sigma} \\int_{-\\infty}^{\\infty} e^{-u^2} \\sqrt{2}\\,\\sigma\\,du = \\frac{1}{\\sqrt{\\pi}} \\cdot \\sqrt{\\pi} = 1
+$$
+
+這解釋了為何常態分佈係數中必然出現神秘的 $\\frac{1}{\\sqrt{2\\pi}}$。
+`
+      },
+      {
+        id: 'art-genai-keynote',
+        title: '2026 生成式 AI 實務與考照攻略專題演講',
+        majorCategoryId: 'lectures',
+        minorCategory: '校園講座',
+        date: '2026-11-25',
+        coverImage: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80',
+        eventTime: '2026-12-12（六）14:00 - 16:30',
+        eventLocation: '東海大學 圖書館良鑑廳（同步線上直播）',
+        slidesUrl: 'https://docs.google.com/presentation/',
+        quizUrl: 'https://www.ipas.org.tw/',
+        content: `## 演講大綱與核心亮點
+
+本場專題演講面向大專院校師生與準備 **iPAS AI 應用規劃師** 認證的學員，系統化串聯「理論公式理解 → 考照評估指標計算 → 生成式 AI 專案落地」三大主軸。
+
+1. **生成式 AI 技術脈絡**：從詞向量、Transformer 到 RAG 企業知識庫檢索。
+2. **考照高頻計算題實戰**：混淆矩陣（Confusion Matrix）與分類模型評估指標。
+3. **負責任 AI 與資安治理**：個資去識別化、幻覺抑制與人工覆核流程。
+
+---
+
+## 必考計算核心：分類模型評估指標
+
+在醫療診斷、金融詐欺偵測等**類別不平衡（Class Imbalance）**場景下，單看準確率（Accuracy）會產生嚴重誤導，必須綜合檢視精確率（Precision）、召回率（Recall）與 $F_1\\text{-Score}$：
+
+$$
+\\begin{aligned}
+\\text{Precision} &= \\frac{TP}{TP + FP} \\\\[6pt]
+\\text{Recall} &= \\frac{TP}{TP + FN} \\\\[6pt]
+F_1 &= 2 \\cdot \\frac{\\text{Precision} \\cdot \\text{Recall}}{\\text{Precision} + \\text{Recall}} = \\frac{2TP}{2TP + FP + FN}
+\\end{aligned}
+$$
+
+### 混淆矩陣與場景權衡對照表
+
+| 實務場景 | 最應優先防範之錯誤 | 優先優化指標 |
+| :--- | :--- | :--- |
+| **惡性腫瘤早期篩檢** | 漏報病患（False Negative, $FN$） | **Recall（召回率）** |
+| **垃圾郵件自動攔截** | 誤殺重要商務信（False Positive, $FP$） | **Precision（精確率）** |
+| **綜合考照模型評比** | 同時兼顧誤報與漏報 | **$F_1\\text{-Score}$ / AUC-ROC** |
+
+> **現場互動提示**：請點擊上方資訊列的「前往投影片」與「考照題庫資源」連結，搭配本篇筆記於演講前後進行自我檢測。
+`
+      }
+    ];
+
+    // ==================== 2. 狀態管理與 LocalStorage 讀寫 ====================
+    let appData = { categories: [], articles: [] };
+
+    const uiState = {
+      selectedMajorId: 'all',   // 'all' 或某大分類 id
+      selectedMinorName: null,  // null 或小分類名稱
+      expandedMajors: new Set(),
+      searchQuery: '',
+      activeArticleId: null,    // 非 null 時進入閱讀檢視頁
+      uploadedCoverBase64: ''
+    };
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.categories) && Array.isArray(parsed.articles)) {
+            appData = parsed;
+            appData.categories.forEach(c => uiState.expandedMajors.add(c.id));
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('讀取 localStorage 失敗:', err);
+      }
+      appData = {
+        categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
+        articles: JSON.parse(JSON.stringify(DEFAULT_ARTICLES))
+      };
+      appData.categories.forEach(c => uiState.expandedMajors.add(c.id));
+      saveData();
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (err) {
+        console.error('儲存 localStorage 失敗:', err);
+        showToast('儲存空間已滿，建議減少上傳圖片大小或改用圖片網址。', 'warning');
+      }
+    }
+
+    // ==================== 3. Markdown + KaTeX 防衝突渲染引擎 ====================
+    /**
+     * 先保護程式碼區塊，再擷取 $$...$$ 與 $...$ 數學公式為純英數佔位符，
+     * 避免 Marked.js 誤將公式內的 _ * \ 解析為斜體或跳脫字元，
+     * 最後由 KaTeX 精準渲染所有公式與符號。
+     */
+    function renderMarkdownWithLatex(rawText) {
+      if (!rawText || !rawText.trim()) {
+        return '<p class="text-stone-400 text-sm">尚無內容...</p>';
+      }
+
+      const codeBlocks = [];
+      const displayMaths = [];
+      const inlineMaths = [];
+
+      let text = String(rawText);
+
+      // Step 1: 暫時保護 Fenced code blocks (```...```) 與 inline code (`...`)
+      text = text.replace(/```[\s\S]*?```/g, match => {
+        const idx = codeBlocks.push(match) - 1;
+        return `CODEFENCEPH${idx}END`;
+      });
+      text = text.replace(/`[^`\n]+`/g, match => {
+        const idx = codeBlocks.push(match) - 1;
+        return `CODEFENCEPH${idx}END`;
+      });
+
+      // Step 2: 擷取區塊公式 $$...$$ 與 \[...\]
+      text = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => {
+        const idx = displayMaths.push(tex.trim()) - 1;
+        return `\n\nKATEXBLOCKPH${idx}END\n\n`;
+      });
+      text = text.replace(/\\\[([\s\S]+?)\\\]/g, (_, tex) => {
+        const idx = displayMaths.push(tex.trim()) - 1;
+        return `\n\nKATEXBLOCKPH${idx}END\n\n`;
+      });
+
+      // Step 3: 擷取行內公式 $...$ 與 \(...\)
+      text = text.replace(/(?<!\\)\$([^\$\n]+?)(?<!\\)\$/g, (_, tex) => {
+        const idx = inlineMaths.push(tex.trim()) - 1;
+        return `KATEXINLINEPH${idx}END`;
+      });
+      text = text.replace(/\\\((.+?)\\\)/g, (_, tex) => {
+        const idx = inlineMaths.push(tex.trim()) - 1;
+        return `KATEXINLINEPH${idx}END`;
+      });
+
+      // Step 4: 還原程式碼區塊，交給 Marked.js 正確渲染語法區塊
+      text = text.replace(/CODEFENCEPH(\d+)END/g, (_, i) => codeBlocks[Number(i)]);
+
+      // Step 5: 透過 Marked.js 解析 Markdown
+      marked.setOptions({ gfm: true, breaks: true });
+      let html = marked.parse(text);
+
+      // 包裝表格以支援行動裝置水平捲動
+      html = html.replace(/<table>/g, '<div class="table-wrap"><table>').replace(/<\/table>/g, '</table></div>');
+
+      // Step 6: 以 KaTeX 渲染區塊公式
+      html = html.replace(/(?:<p>)?\s*KATEXBLOCKPH(\d+)END\s*(?:<\/p>)?/g, (_, i) => {
+        const tex = displayMaths[Number(i)];
+        try {
+          const rendered = katex.renderToString(tex, {
+            displayMode: true,
+            throwOnError: false,
+            strict: false
+          });
+          return `<div class="katex-block-wrapper">${rendered}</div>`;
+        } catch (err) {
+          return `<div class="katex-block-wrapper text-rose-700 text-xs font-mono-meta">${escapeHtml(tex)}</div>`;
+        }
+      });
+
+      // Step 7: 以 KaTeX 渲染行內公式
+      html = html.replace(/KATEXINLINEPH(\d+)END/g, (_, i) => {
+        const tex = inlineMaths[Number(i)];
+        try {
+          return katex.renderToString(tex, {
+            displayMode: false,
+            throwOnError: false,
+            strict: false
+          });
+        } catch (err) {
+          return `<code class="text-rose-700">${escapeHtml(tex)}</code>`;
+        }
+      });
+
+      return html;
+    }
+
+    // ==================== 4. 幾何數學 SVG 備援底圖（永不破圖） ====================
+    function buildMathFallbackSvg(seedIndex = 0) {
+      const palettes = [
+        { bg: '#1E3A5F', stroke: '#D4B483', accent: '#9A5B13' },
+        { bg: '#26382E', stroke: '#D6C7A9', accent: '#A66E38' },
+        { bg: '#352A24', stroke: '#E0C9A6', accent: '#9A5B13' }
+      ];
+      const p = palettes[Math.abs(seedIndex) % palettes.length];
+      return `
+        <svg viewBox="0 0 324 200" preserveAspectRatio="xMidYMid slice" class="w-full h-full">
+          <rect width="324" height="200" fill="${p.bg}" />
+          <g fill="none" stroke="${p.stroke}" stroke-opacity="0.22" stroke-width="0.9">
+            <rect x="16" y="16" width="292" height="168" />
+            <line x1="196" y1="16" x2="196" y2="184" />
+            <line x1="196" y1="120" x2="308" y2="120" />
+            <circle cx="196" cy="120" r="104" stroke-dasharray="3 3" />
+            <path d="M 16 184 A 168 168 0 0 1 196 16 A 104 104 0 0 1 308 120 A 64 64 0 0 1 244 184" stroke="${p.stroke}" stroke-opacity="0.48" stroke-width="1.3" />
+            <circle cx="106" cy="100" r="46" stroke-opacity="0.16" />
+          </g>
+          <text x="26" y="42" fill="${p.stroke}" fill-opacity="0.45" font-family="Georgia, serif" font-size="13" letter-spacing="2">φ = 1.618</text>
+        </svg>
+      `;
+    }
+
+    // ==================== 5. 畫面渲染：側邊欄 + 黃金比例卡片網格 ====================
+    function renderAll() {
+      renderSidebarCategories();
+      if (uiState.activeArticleId) {
+        const exists = appData.articles.some(a => a.id === uiState.activeArticleId);
+        if (exists) {
+          renderReaderView(uiState.activeArticleId);
+        } else {
+          closeReaderView();
+        }
+      } else {
+        renderGoldenGrid();
+      }
+      lucide.createIcons();
+    }
+
+    function renderSidebarCategories() {
+      const totalCount = appData.articles.length;
+      const isAllActive = uiState.selectedMajorId === 'all' && !uiState.selectedMinorName;
+
+      const allBtn = document.getElementById('allArticlesBtn');
+      const allBadge = document.getElementById('allCountBadge');
+      allBtn.className = `w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition ${
+        isAllActive
+          ? 'bg-[#1E3A5F] text-white shadow-sm'
+          : 'text-stone-700 hover:bg-[#EAE4D8]/80'
+      }`;
+      allBadge.textContent = totalCount;
+      allBadge.className = `font-mono-meta text-xs px-2 py-0.5 rounded-full ${
+        isAllActive ? 'bg-white/20 text-white' : 'bg-white/80 text-stone-500 border border-[#E5E0D8]'
+      }`;
+
+      const nav = document.getElementById('categoryTreeNav');
+      nav.innerHTML = appData.categories.map(cat => {
+        const majorCount = appData.articles.filter(a => a.majorCategoryId === cat.id).length;
+        const isMajorSelected = uiState.selectedMajorId === cat.id && !uiState.selectedMinorName;
+        const isExpanded = uiState.expandedMajors.has(cat.id);
+
+        const subButtonsHtml = isExpanded ? `
+          <div class="pl-4 mt-1 ml-3 border-l border-[#D8D1C4] space-y-0.5">
+            ${cat.subcategories.map(sub => {
+              const subCount = appData.articles.filter(a => a.majorCategoryId === cat.id && a.minorCategory === sub).length;
+              const isSubActive = uiState.selectedMajorId === cat.id && uiState.selectedMinorName === sub;
+              return `
+                <button type="button" onclick="selectMinorCategory('${escapeAttr(cat.id)}', '${escapeAttr(sub)}')"
+                  class="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-xs transition ${
+                    isSubActive
+                      ? 'bg-[#9A5B13]/12 text-[#9A5B13] font-semibold'
+                      : 'text-stone-600 hover:bg-[#EAE4D8]/70 hover:text-stone-900'
+                  }">
+                  <span class="flex items-center gap-2 truncate">
+                    <span class="w-1.5 h-1.5 rounded-full ${isSubActive ? 'bg-[#9A5B13]' : 'bg-stone-300'}"></span>
+                    <span class="truncate">${escapeHtml(sub)}</span>
+                  </span>
+                  <span class="font-mono-meta text-[11px] ${isSubActive ? 'text-[#9A5B13]' : 'text-stone-400'}">${subCount}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        ` : '';
+
+        return `
+          <div>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="selectMajorCategory('${escapeAttr(cat.id)}')"
+                class="flex-1 min-w-0 flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                  isMajorSelected
+                    ? 'bg-[#1E3A5F] text-white font-medium shadow-sm'
+                    : 'text-stone-800 hover:bg-[#EAE4D8]/80 font-medium'
+                }">
+                <span class="inline-flex items-center gap-2.5 truncate">
+                  <i data-lucide="${escapeHtml(cat.icon || 'folder')}" class="w-4 h-4 shrink-0 ${isMajorSelected ? 'text-amber-300' : 'text-[#1E3A5F]'}"></i>
+                  <span class="truncate">${escapeHtml(cat.name)}</span>
+                </span>
+                <span class="font-mono-meta text-[11px] shrink-0 ${isMajorSelected ? 'text-white/85' : 'text-stone-400'}">${majorCount}</span>
+              </button>
+              <button type="button" onclick="toggleMajorExpand('${escapeAttr(cat.id)}')"
+                class="p-2 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-[#EAE4D8]/70 transition shrink-0"
+                title="${isExpanded ? '收合小分類' : '展開小分類'}">
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-0' : '-rotate-90'}"></i>
+              </button>
+            </div>
+            ${subButtonsHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getFilteredArticles() {
+      const q = uiState.searchQuery.trim().toLowerCase();
+      return appData.articles
+        .filter(a => {
+          if (uiState.selectedMajorId !== 'all' && a.majorCategoryId !== uiState.selectedMajorId) return false;
+          if (uiState.selectedMinorName && a.minorCategory !== uiState.selectedMinorName) return false;
+          if (q) {
+            const majorName = getMajorCategoryName(a.majorCategoryId);
+            const haystack = `${a.title} ${majorName} ${a.minorCategory} ${a.content} ${a.eventLocation || ''}`.toLowerCase();
+            if (!haystack.includes(q)) return false;
+          }
+          return true;
+        })
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    }
+
+    function renderGoldenGrid() {
+      document.getElementById('gridView').classList.remove('hidden');
+      document.getElementById('readerView').classList.add('hidden');
+
+      const filtered = getFilteredArticles();
+      const majorCat = appData.categories.find(c => c.id === uiState.selectedMajorId);
+
+      // 更新麵包屑與標題
+      const breadcrumbEl = document.getElementById('breadcrumbTrail');
+      const headingEl = document.getElementById('viewHeading');
+
+      if (uiState.selectedMajorId === 'all') {
+        breadcrumbEl.innerHTML = `<span>ARCHIVE</span><span>/</span><span>ALL COLLECTION</span>`;
+        headingEl.textContent = uiState.searchQuery ? `搜尋「${uiState.searchQuery}」` : '全部典藏';
+      } else if (majorCat && !uiState.selectedMinorName) {
+        breadcrumbEl.innerHTML = `<button type="button" onclick="selectAllArticles()" class="hover:underline">全部典藏</button><span>›</span><span>${escapeHtml(majorCat.name)}</span>`;
+        headingEl.textContent = majorCat.name;
+      } else if (majorCat && uiState.selectedMinorName) {
+        breadcrumbEl.innerHTML = `
+          <button type="button" onclick="selectAllArticles()" class="hover:underline">全部典藏</button>
+          <span>›</span>
+          <button type="button" onclick="selectMajorCategory('${escapeAttr(majorCat.id)}')" class="hover:underline">${escapeHtml(majorCat.name)}</button>
+          <span>›</span>
+          <span class="text-[#1E3A5F] font-semibold">${escapeHtml(uiState.selectedMinorName)}</span>
+        `;
+        headingEl.textContent = uiState.selectedMinorName;
+      }
+
+      document.getElementById('articleCountMeta').textContent = `共 ${filtered.length} 篇典藏`;
+
+      const grid = document.getElementById('goldenCardGrid');
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="col-span-full py-20 text-center border border-dashed border-[#D8D1C4] rounded-xl bg-white/60">
+            <p class="font-serif-editorial text-lg text-stone-700">此分類下尚無典藏筆記</p>
+            <p class="text-xs text-stone-400 mt-1.5 mb-5">您可以點擊左側「新增筆記」撰寫 Markdown 與 LaTeX 推導內容</p>
+            <button type="button" onclick="openEditorModal()"
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition">
+              <i data-lucide="pen-line" class="w-3.5 h-3.5"></i>立即新增一篇筆記
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((art, idx) => {
+        const hasImg = Boolean(art.coverImage && art.coverImage.trim());
+        const fallbackSvg = buildMathFallbackSvg(idx);
+
+        return `
+          <article onclick="openReaderView('${escapeAttr(art.id)}')"
+            class="golden-card group relative rounded-xl overflow-hidden cursor-pointer select-none animate-fade-in">
+            <!-- 封面圖片 + 永不破圖之幾何 SVG 備援 -->
+            ${hasImg ? `
+              <img src="${escapeHtml(art.coverImage)}" alt="${escapeHtml(art.title)}" loading="lazy"
+                onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+              <div class="hidden absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-105">${fallbackSvg}</div>
+            ` : `
+              <div class="absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-105">${fallbackSvg}</div>
+            `}
+
+            <!-- 細緻底部漸層遮罩，確保標題於照片上高度清晰易讀 -->
+            <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/35 to-stone-950/10 transition-opacity duration-300 group-hover:from-stone-950/95"></div>
+
+            <!-- 右上角極簡分類標籤 -->
+            <div class="absolute top-3.5 right-3.5 z-10">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#FAF8F4]/90 backdrop-blur-sm text-[#1C1917] border border-white/40 shadow-sm">
+                ${escapeHtml(art.minorCategory || getMajorCategoryName(art.majorCategoryId))}
+              </span>
+            </div>
+
+            <!-- 底部標題與日期 -->
+            <div class="absolute inset-x-0 bottom-0 z-10 p-5 flex flex-col justify-end">
+              <div class="font-mono-meta text-[10px] tracking-[0.16em] uppercase text-amber-200/90 mb-1.5">
+                ${escapeHtml(getMajorCategoryName(art.majorCategoryId))} · ${escapeHtml(art.date || '')}
+              </div>
+              <h3 class="font-serif-editorial text-lg sm:text-[1.15rem] font-semibold text-white leading-snug line-clamp-2 drop-shadow-sm group-hover:text-amber-100 transition-colors">
+                ${escapeHtml(art.title)}
+              </h3>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // ==================== 6. 內容閱讀頁 (Reader View) ====================
+    window.openReaderView = function(articleId) {
+      uiState.activeArticleId = articleId;
+      renderReaderView(articleId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toggleMobileSidebar(false);
+    };
+
+    function renderReaderView(articleId) {
+      const art = appData.articles.find(a => a.id === articleId);
+      if (!art) return;
+
+      document.getElementById('gridView').classList.add('hidden');
+      document.getElementById('readerView').classList.remove('hidden');
+
+      const majorName = getMajorCategoryName(art.majorCategoryId);
+      const hasImg = Boolean(art.coverImage && art.coverImage.trim());
+      const fallbackSvg = buildMathFallbackSvg(appData.articles.indexOf(art));
+
+      // 標頭與大封面圖
+      document.getElementById('readerHeader').innerHTML = `
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-full bg-[#1E3A5F] text-white font-medium">${escapeHtml(majorName)}</span>
+          ${art.minorCategory ? `<span class="px-2.5 py-1 rounded-full bg-[#9A5B13]/12 text-[#9A5B13] border border-[#9A5B13]/25 font-medium">${escapeHtml(art.minorCategory)}</span>` : ''}
+          <span class="font-mono-meta text-stone-400 ml-auto">${escapeHtml(art.date || '')}</span>
+        </div>
+
+        <h1 class="font-serif-editorial text-2xl sm:text-4xl font-bold text-[#1C1917] leading-tight">
+          ${escapeHtml(art.title)}
+        </h1>
+
+        <div class="golden-card relative rounded-xl overflow-hidden max-h-[420px] w-full">
+          ${hasImg ? `
+            <img src="${escapeHtml(art.coverImage)}" alt="${escapeHtml(art.title)}"
+              onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+              class="w-full h-full object-cover" />
+            <div class="hidden w-full h-full">${fallbackSvg}</div>
+          ` : `<div class="w-full h-full">${fallbackSvg}</div>`}
+        </div>
+      `;
+
+      // 演講資訊與投影片／題庫連結資訊條
+      const metaBar = document.getElementById('readerMetaBar');
+      const hasMeta = art.eventTime || art.eventLocation || art.slidesUrl || art.quizUrl;
+      if (hasMeta) {
+        metaBar.classList.remove('hidden');
+        metaBar.innerHTML = `
+          <div class="p-4 sm:p-5 rounded-xl bg-[#F5F2EB] border border-[#E5E0D8] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1.5 text-xs sm:text-sm text-stone-700">
+              ${art.eventTime ? `<div class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#9A5B13] shrink-0"></i><span class="font-mono-meta">${escapeHtml(art.eventTime)}</span></div>` : ''}
+              ${art.eventLocation ? `<div class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-[#1E3A5F] shrink-0"></i><span>${escapeHtml(art.eventLocation)}</span></div>` : ''}
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              ${art.slidesUrl ? `
+                <a href="${escapeHtml(art.slidesUrl)}" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#1E3A5F] hover:bg-[#162C49] text-white text-xs font-medium transition">
+                  <i data-lucide="presentation" class="w-3.5 h-3.5"></i>前往投影片
+                </a>` : ''}
+              ${art.quizUrl ? `
+                <a href="${escapeHtml(art.quizUrl)}" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-[#9A5B13] border border-[#D8D1C4] text-xs font-medium transition">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>考照題庫資源
+                </a>` : ''}
+            </div>
+          </div>
+        `;
+      } else {
+        metaBar.classList.add('hidden');
+        metaBar.innerHTML = '';
+      }
+
+      // 渲染 Markdown + KaTeX 數學公式
+      document.getElementById('readerProseBody').innerHTML = renderMarkdownWithLatex(art.content);
+
+      // 綁定編輯與刪除按鈕
+      document.getElementById('readerEditBtn').onclick = () => openEditorModal(art.id);
+      document.getElementById('readerDeleteBtn').onclick = () => confirmDeleteArticle(art.id);
+
+      lucide.createIcons();
+    }
+
+    window.closeReaderView = function() {
+      uiState.activeArticleId = null;
+      renderGoldenGrid();
+      lucide.createIcons();
+    };
+
+    // ==================== 7. 分類選擇與側欄互動 ====================
+    window.selectAllArticles = function() {
+      uiState.selectedMajorId = 'all';
+      uiState.selectedMinorName = null;
+      uiState.activeArticleId = null;
+      renderAll();
+      toggleMobileSidebar(false);
+    };
+
+    window.selectMajorCategory = function(majorId) {
+      uiState.selectedMajorId = majorId;
+      uiState.selectedMinorName = null;
+      uiState.activeArticleId = null;
+      uiState.expandedMajors.add(majorId);
+      renderAll();
+      toggleMobileSidebar(false);
+    };
+
+    window.selectMinorCategory = function(majorId, minorName) {
+      uiState.selectedMajorId = majorId;
+      uiState.selectedMinorName = minorName;
+      uiState.activeArticleId = null;
+      uiState.expandedMajors.add(majorId);
+      renderAll();
+      toggleMobileSidebar(false);
+    };
+
+    window.toggleMajorExpand = function(majorId) {
+      if (uiState.expandedMajors.has(majorId)) {
+        uiState.expandedMajors.delete(majorId);
+      } else {
+        uiState.expandedMajors.add(majorId);
+      }
+      renderSidebarCategories();
+      lucide.createIcons();
+    };
+
+    window.clearSearch = function() {
+      uiState.searchQuery = '';
+      document.getElementById('sidebarSearchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderGoldenGrid();
+      lucide.createIcons();
+    };
+
+    window.toggleMobileSidebar = function(show) {
+      const drawer = document.getElementById('sidebarDrawer');
+      const backdrop = document.getElementById('mobileBackdrop');
+      if (show) {
+        drawer.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        drawer.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    };
+
+    // ==================== 8. 雙欄即時預覽編輯器 ====================
+    window.openEditorModal = function(editId = null) {
+      uiState.uploadedCoverBase64 = '';
+      document.getElementById('editArticleId').value = editId || '';
+      document.getElementById('editCoverFile').value = '';
+
+      // 填充大分類下拉選單
+      const majorSel = document.getElementById('editMajorCat');
+      majorSel.innerHTML = appData.categories.map(c =>
+        `<option value="${escapeAttr(c.id)}">${escapeHtml(c.name)}</option>`
+      ).join('');
+
+      const extraBox = document.getElementById('extraMetaFields');
+
+      if (editId) {
+        const art = appData.articles.find(a => a.id === editId);
+        if (!art) return;
+        document.getElementById('editorModalTitle').textContent = '編輯典藏筆記';
+        document.getElementById('editTitle').value = art.title || '';
+        majorSel.value = art.majorCategoryId || (appData.categories[0]?.id || '');
+        syncMinorCatDropdown(art.minorCategory);
+        document.getElementById('editDate').value = art.date || todayStr();
+
+        if (art.coverImage && art.coverImage.startsWith('data:')) {
+          uiState.uploadedCoverBase64 = art.coverImage;
+          document.getElementById('editCoverUrl').value = '';
+        } else {
+          document.getElementById('editCoverUrl').value = art.coverImage || '';
+        }
+
+        document.getElementById('editEventTime').value = art.eventTime || '';
+        document.getElementById('editEventLocation').value = art.eventLocation || '';
+        document.getElementById('editSlidesUrl').value = art.slidesUrl || '';
+        document.getElementById('editQuizUrl').value = art.quizUrl || '';
+
+        const hasExtra = art.eventTime || art.eventLocation || art.slidesUrl || art.quizUrl;
+        extraBox.classList.toggle('hidden', !hasExtra);
+        document.getElementById('extraMetaToggleText').textContent = hasExtra ? '收合演講 / 資源欄位' : '展開演講 / 資源欄位';
+
+        document.getElementById('editMarkdownInput').value = art.content || '';
+      } else {
+        document.getElementById('editorModalTitle').textContent = '新增數理與智識筆記';
+        document.getElementById('editTitle').value = '';
+        if (uiState.selectedMajorId !== 'all') majorSel.value = uiState.selectedMajorId;
+        syncMinorCatDropdown(uiState.selectedMinorName);
+        document.getElementById('editDate').value = todayStr();
+        document.getElementById('editCoverUrl').value = '';
+        document.getElementById('editEventTime').value = '';
+        document.getElementById('editEventLocation').value = '';
+        document.getElementById('editSlidesUrl').value = '';
+        document.getElementById('editQuizUrl').value = '';
+        extraBox.classList.add('hidden');
+        document.getElementById('extraMetaToggleText').textContent = '展開演講 / 資源欄位';
+        document.getElementById('editMarkdownInput').value = `## 核心推導與筆記\n\n在此撰寫您的 **Markdown** 內容與行內公式 $f(x) = \\sin(x)$。\n\n$$\n\\int_{0}^{\\pi} \\sin(x)\\,dx = 2\n$$\n`;
+      }
+
+      updateLivePreview();
+      openModal('editorModal');
+      toggleMobileSidebar(false);
+    };
+
+    window.syncMinorCatDropdown = function(preselectMinor = null) {
+      const majorId = document.getElementById('editMajorCat').value;
+      const cat = appData.categories.find(c => c.id === majorId);
+      const minorSel = document.getElementById('editMinorCat');
+      const subs = cat?.subcategories || [];
+      minorSel.innerHTML = subs.length
+        ? subs.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join('')
+        : `<option value="未分類">未分類</option>`;
+      if (preselectMinor && subs.includes(preselectMinor)) {
+        minorSel.value = preselectMinor;
+      }
+    };
+
+    window.toggleExtraMetaFields = function() {
+      const box = document.getElementById('extraMetaFields');
+      const isHidden = box.classList.toggle('hidden');
+      document.getElementById('extraMetaToggleText').textContent = isHidden ? '展開演講 / 資源欄位' : '收合演講 / 資源欄位';
+    };
+
+    window.handleCoverUpload = async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        uiState.uploadedCoverBase64 = await compressImageToBase64(file, 960, 0.76);
+        document.getElementById('editCoverUrl').value = '';
+        showToast('封面照片已壓縮並就緒！', 'success');
+      } catch (err) {
+        showToast('圖片處理失敗，請重新選擇圖片。', 'warning');
+      }
+    };
+
+    window.insertSnippet = function(prefix, suffix, placeholder) {
+      const ta = document.getElementById('editMarkdownInput');
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = ta.value.slice(start, end) || placeholder;
+      const inserted = prefix + selected + suffix;
+      ta.value = ta.value.slice(0, start) + inserted + ta.value.slice(end);
+      ta.focus();
+      const cursorPos = start + prefix.length + selected.length;
+      ta.setSelectionRange(start + prefix.length, cursorPos);
+      updateLivePreview();
+    };
+
+    window.updateLivePreview = function() {
+      const md = document.getElementById('editMarkdownInput').value;
+      document.getElementById('livePreviewContent').innerHTML = renderMarkdownWithLatex(md);
+    };
+
+    window.saveArticleFromEditor = function() {
+      const title = document.getElementById('editTitle').value.trim();
+      if (!title) {
+        showToast('請輸入文章標題。', 'warning');
+        document.getElementById('editTitle').focus();
+        return;
+      }
+
+      const editId = document.getElementById('editArticleId').value;
+      const coverUrlInput = document.getElementById('editCoverUrl').value.trim();
+      const coverImage = uiState.uploadedCoverBase64 || coverUrlInput;
+
+      const articlePayload = {
+        id: editId || ('art-' + Date.now()),
+        title,
+        majorCategoryId: document.getElementById('editMajorCat').value,
+        minorCategory: document.getElementById('editMinorCat').value,
+        date: document.getElementById('editDate').value || todayStr(),
+        coverImage,
+        eventTime: document.getElementById('editEventTime').value.trim(),
+        eventLocation: document.getElementById('editEventLocation').value.trim(),
+        slidesUrl: document.getElementById('editSlidesUrl').value.trim(),
+        quizUrl: document.getElementById('editQuizUrl').value.trim(),
+        content: document.getElementById('editMarkdownInput').value
+      };
+
+      if (editId) {
+        appData.articles = appData.articles.map(a => a.id === editId ? articlePayload : a);
+        showToast('筆記已更新並儲存！', 'success');
+      } else {
+        appData.articles.unshift(articlePayload);
+        uiState.activeArticleId = articlePayload.id;
+        showToast('已成功新增至典藏庫！', 'success');
+      }
+
+      saveData();
+      closeModal('editorModal');
+      renderAll();
+    };
+
+    function confirmDeleteArticle(articleId) {
+      openConfirm('刪除典藏筆記', '確定要永久刪除這篇筆記嗎？此動作無法復原。', () => {
+        appData.articles = appData.articles.filter(a => a.id !== articleId);
+        saveData();
+        uiState.activeArticleId = null;
+        renderAll();
+        showToast('已刪除該篇筆記。', 'info');
+      });
+    }
+
+    // ==================== 9. 分類管理 (大分類與小分類 CRUD) ====================
+    window.openCategoryModal = function() {
+      renderCategoryManagerList();
+      openModal('categoryModal');
+      toggleMobileSidebar(false);
+    };
+
+    function renderCategoryManagerList() {
+      const container = document.getElementById('categoryManagerList');
+      container.innerHTML = appData.categories.map(cat => `
+        <div class="p-4 rounded-lg bg-white border border-[#E5E0D8] space-y-3">
+          <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-[#F2EEE6]">
+            <div class="flex items-center gap-2">
+              <i data-lucide="${escapeHtml(cat.icon || 'folder')}" class="w-4 h-4 text-[#1E3A5F]"></i>
+              <span class="font-serif-editorial font-bold text-stone-900">${escapeHtml(cat.name)}</span>
+              <span class="font-mono-meta text-[11px] text-stone-400">(${cat.subcategories.length} 個小分類)</span>
+            </div>
+            <button type="button" onclick="deleteMajorCategory('${escapeAttr(cat.id)}')"
+              class="text-xs text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-md transition">
+              刪除大分類
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5">
+            ${cat.subcategories.map(sub => `
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#FAF8F4] border border-[#E5E0D8] text-stone-700">
+                <span>${escapeHtml(sub)}</span>
+                <button type="button" onclick="deleteMinorCategory('${escapeAttr(cat.id)}', '${escapeAttr(sub)}')"
+                  class="text-stone-400 hover:text-rose-600" title="移除小分類">✕</button>
+              </span>
+            `).join('') || '<span class="text-xs text-stone-400">尚無小分類</span>'}
+          </div>
+
+          <form onsubmit="handleAddMinorCategory(event, '${escapeAttr(cat.id)}')" class="flex gap-2 pt-1">
+            <input type="text" required placeholder="新增小分類名稱..."
+              class="flex-1 px-3 py-1.5 text-xs bg-[#FAF8F4] border border-[#D8D2C5] rounded-lg focus:outline-none focus:border-[#1E3A5F]" />
+            <button type="submit" class="px-3 py-1.5 rounded-lg bg-[#9A5B13] hover:bg-[#7D490E] text-white text-xs font-medium transition">
+              + 新增小分類
+            </button>
+          </form>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    window.handleAddMajorCategory = function(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('newMajorName');
+      const name = nameInput.value.trim();
+      const icon = document.getElementById('newMajorIcon').value;
+      if (!name) return;
+
+      const newCat = {
+        id: 'cat-' + Date.now(),
+        name,
+        icon,
+        subcategories: ['一般筆記']
+      };
+      appData.categories.push(newCat);
+      uiState.expandedMajors.add(newCat.id);
+      nameInput.value = '';
+      saveData();
+      renderCategoryManagerList();
+      renderSidebarCategories();
+      lucide.createIcons();
+      showToast(`已新增大分類「${name}」！`, 'success');
+    };
+
+    window.handleAddMinorCategory = function(e, majorId) {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const subName = input.value.trim();
+      const cat = appData.categories.find(c => c.id === majorId);
+      if (!cat || !subName) return;
+      if (cat.subcategories.includes(subName)) {
+        showToast('此小分類已存在。', 'warning');
+        return;
+      }
+      cat.subcategories.push(subName);
+      input.value = '';
+      saveData();
+      renderCategoryManagerList();
+      renderSidebarCategories();
+      lucide.createIcons();
+      showToast(`已新增小分類「${subName}」！`, 'success');
+    };
+
+    window.deleteMajorCategory = function(majorId) {
+      if (appData.categories.length <= 1) {
+        showToast('系統至少需保留一個大分類。', 'warning');
+        return;
+      }
+      const cat = appData.categories.find(c => c.id === majorId);
+      openConfirm('刪除大分類', `確定要刪除大分類「${cat?.name}」嗎？其底下文章將自動移至第一個分類。`, () => {
+        appData.categories = appData.categories.filter(c => c.id !== majorId);
+        const fallback = appData.categories[0];
+        appData.articles.forEach(a => {
+          if (a.majorCategoryId === majorId) {
+            a.majorCategoryId = fallback.id;
+            a.minorCategory = fallback.subcategories[0] || '未分類';
+          }
+        });
+        if (uiState.selectedMajorId === majorId) {
+          uiState.selectedMajorId = 'all';
+          uiState.selectedMinorName = null;
+        }
+        saveData();
+        renderCategoryManagerList();
+        renderAll();
+        showToast('已刪除該大分類。', 'info');
+      });
+    };
+
+    window.deleteMinorCategory = function(majorId, subName) {
+      const cat = appData.categories.find(c => c.id === majorId);
+      if (!cat) return;
+      cat.subcategories = cat.subcategories.filter(s => s !== subName);
+      if (uiState.selectedMajorId === majorId && uiState.selectedMinorName === subName) {
+        uiState.selectedMinorName = null;
+      }
+      saveData();
+      renderCategoryManagerList();
+      renderAll();
+      showToast(`已移除小分類「${subName}」。`, 'info');
+    };
+
+    // ==================== 10. JSON 備份與還原 ====================
+    window.openBackupModal = function() {
+      openModal('backupModal');
+      toggleMobileSidebar(false);
+    };
+
+    window.exportBackupJson = function() {
+      const payload = {
+        site: '數理與智識典藏 | Math & AI Archive',
+        exportedAt: new Date().toISOString(),
+        categories: appData.categories,
+        articles: appData.articles
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Math_AI_Archive_Backup_${todayStr()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('已匯出 JSON 備份檔案！', 'success');
+    };
+
+    window.importBackupJson = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!Array.isArray(parsed.categories) || !Array.isArray(parsed.articles)) {
+            throw new Error('JSON 格式不符');
+          }
+          appData = { categories: parsed.categories, articles: parsed.articles };
+          uiState.selectedMajorId = 'all';
+          uiState.selectedMinorName = null;
+          uiState.activeArticleId = null;
+          uiState.expandedMajors = new Set(appData.categories.map(c => c.id));
+          saveData();
+          closeModal('backupModal');
+          renderAll();
+          showToast(`成功匯入 ${appData.articles.length} 篇典藏文章！`, 'success');
+        } catch (err) {
+          showToast('匯入失敗：請確認為有效的典藏備份 JSON 檔。', 'warning');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+
+    window.requestResetDefaultData = function() {
+      openConfirm('恢復預設範例資料', '將重置為預設的 3 個大分類與 6 篇數理／AI 典藏文章，確定執行嗎？', () => {
+        appData = {
+          categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
+          articles: JSON.parse(JSON.stringify(DEFAULT_ARTICLES))
+        };
+        uiState.selectedMajorId = 'all';
+        uiState.selectedMinorName = null;
+        uiState.activeArticleId = null;
+        uiState.expandedMajors = new Set(appData.categories.map(c => c.id));
+        saveData();
+        closeModal('backupModal');
+        renderAll();
+        showToast('已恢復預設範例資料！', 'success');
+      });
+    };
+
+    // ==================== 11. 共用工具函式 ====================
+    function getMajorCategoryName(majorId) {
+      return appData.categories.find(c => c.id === majorId)?.name || '未分類';
+    }
+
+    function todayStr() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function compressImageToBase64(file, maxW = 960, quality = 0.76) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.openModal = function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    };
+
+    window.closeModal = function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+      if (!document.querySelector('.fixed.flex[id$="Modal"]')) {
+        document.body.style.overflow = '';
+      }
+    };
+
+    function openConfirm(title, message, onConfirm) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      document.getElementById('confirmOkBtn').onclick = () => {
+        closeModal('confirmModal');
+        onConfirm();
+      };
+      openModal('confirmModal');
+    }
+
+    function showToast(msg, type = 'info') {
+      const box = document.getElementById('toastContainer');
+      const bg = type === 'success' ? 'bg-[#1E3A5F] text-white' : type === 'warning' ? 'bg-[#9A5B13] text-white' : 'bg-[#1C1917] text-white';
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto px-4 py-2.5 rounded-lg shadow-lg text-xs sm:text-sm font-medium animate-fade-in ${bg}`;
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 260);
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function escapeAttr(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // ==================== 12. 事件綁定與初始化 ====================
+    document.getElementById('sidebarSearchInput').addEventListener('input', e => {
+      uiState.searchQuery = e.target.value;
+      document.getElementById('clearSearchBtn').classList.toggle('hidden', !uiState.searchQuery);
+      if (uiState.activeArticleId) uiState.activeArticleId = null;
+      renderGoldenGrid();
+      lucide.createIcons();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (!document.getElementById('confirmModal').classList.contains('hidden')) {
+          closeModal('confirmModal');
+        } else {
+          ['editorModal', 'categoryModal', 'backupModal'].forEach(closeModal);
+        }
+      }
+    });
+
+    loadData();
+    renderAll();
+  </script>
+</body>
+</html>
