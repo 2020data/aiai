@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>典藏閱讀 — 人工智慧與演講紀錄典藏館</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <link rel="stylesheet" href="./styles/editorial.css" />
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+    <article id="article-root" class="hairline-box p-6 sm:p-10">
+      <div class="text-sm text-zinc-500 py-12 text-center">載入典藏內容中...</div>
+    </article>
+  </main>
+
+  <script type="module">
+    import { mountNavbar } from './components/navbar.js';
+    import { getPostById, updatePostCategory, deletePost } from './modules/db.module.js';
+    import { getCurrentUser } from './modules/auth.module.js';
+    import { getAllCategories, getCategoryById } from './config/categories.config.js';
+    import { renderPostContent } from './modules/parser.module.js';
+    import { classifyContent } from './modules/classifier.module.js';
+    import { renderShareBar } from './modules/share.module.js';
+    import { escapeHTML } from './modules/sanitizer.module.js';
+    import { icon } from './modules/icons.module.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const root = document.getElementById('article-root');
+
+    if (!id) {
+      await mountNavbar();
+      root.innerHTML = `<p class="text-sm text-zinc-600">找不到文章編號。</p>`;
+    } else {
+      try {
+        const [post, user] = await Promise.all([getPostById(id), getCurrentUser()]);
+        const cat = getCategoryById(post.category);
+        document.title = `${post.title} — 人工智慧與演講紀錄典藏館`;
+        await mountNavbar(post.category);
+
+        const isOwner = user && user.id === post.user_id;
+        const dateStr = new Date(post.created_at).toLocaleDateString('zh-TW');
+        const bodyHtml = await renderPostContent(post);
+
+        root.innerHTML = `
+          ${
+            post.cover_image_url
+              ? `<img src="${escapeHTML(post.cover_image_url)}" alt="${escapeHTML(post.title)}" class="w-full max-h-[420px] object-cover mb-8 border border-[#D8D3C8]" />`
+              : ''
+          }
+
+          <header class="pb-6 mb-8 hairline-b">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <a href="./index.html?cat=${encodeURIComponent(cat.id)}"
+                 class="text-xs font-medium px-2.5 py-0.5 text-[#F6F4EF] no-underline"
+                 style="background-color: ${cat.color};">
+                ${escapeHTML(cat.label)}
+              </a>
+              <span class="text-xs px-2.5 py-0.5 border border-[#D8D3C8] text-zinc-700">
+                ${escapeHTML(post.subcategory || '未分類')}
+              </span>
+              <span class="font-mono-index text-xs text-zinc-500 ml-auto" data-no-translate>
+                ${escapeHTML(post.format.toUpperCase())} · ${escapeHTML(post.original_lang)} · ${dateStr}
+              </span>
+            </div>
+
+            <h1 class="font-serif-editorial text-3xl sm:text-4xl font-semibold leading-tight">
+              ${escapeHTML(post.title)}
+            </h1>
+
+            ${
+              post.creator_name
+                ? `<p class="text-sm text-zinc-600 mt-3">創作者 / 編輯者：<strong>${escapeHTML(post.creator_name)}</strong></p>`
+                : ''
+            }
+
+            <div id="share-bar-root" class="mt-5"></div>
+
+            ${
+              isOwner
+                ? `
+                <div class="mt-5 pt-4 hairline-t flex flex-wrap items-center gap-2">
+                  <button id="btn-toggle-cat" type="button" class="editorial-btn-outline !text-xs">${icon('edit')} 修改分類</button>
+                  <button id="btn-delete-post" type="button" class="editorial-btn-outline !text-xs text-red-800 border-red-300 hover:border-red-700">${icon('trash')} 刪除文章</button>
+                </div>
+                <div id="cat-editor-panel" class="hidden mt-3 p-4 bg-[#F6F4EF] border border-[#D8D3C8] space-y-3">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <select id="edit-cat-select" class="editorial-input">
+                      ${getAllCategories().map((c) => `<option value="${c.id}" ${c.id === post.category ? 'selected' : ''}>${c.label}</option>`).join('')}
+                    </select>
+                    <input type="text" id="edit-sub-input" class="editorial-input" value="${escapeHTML(post.subcategory || '未分類')}" />
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button id="btn-save-cat" type="button" class="editorial-btn !text-xs">儲存分類</button>
+                    <button id="btn-reclassify" type="button" class="editorial-btn-outline !text-xs">重新自動判斷</button>
+                  </div>
+                </div>
+                `
+                : ''
+            }
+          </header>
+
+          <div class="editorial-prose">${bodyHtml}</div>
+        `;
+
+        renderShareBar(document.getElementById('share-bar-root'), post.title, window.location.href);
+
+        if (isOwner) {
+          const panel = document.getElementById('cat-editor-panel');
+          document.getElementById('btn-toggle-cat')?.addEventListener('click', () => panel.classList.toggle('hidden'));
+
+          document.getElementById('btn-reclassify')?.addEventListener('click', () => {
+            const res = classifyContent(post.title, post.raw_text);
+            document.getElementById('edit-cat-select').value = res.category;
+            document.getElementById('edit-sub-input').value = res.subcategory;
+          });
+
+          document.getElementById('btn-save-cat')?.addEventListener('click', async () => {
+            try {
+              await updatePostCategory(
+                post.id,
+                document.getElementById('edit-cat-select').value,
+                document.getElementById('edit-sub-input').value
+              );
+              window.location.reload();
+            } catch (err) {
+              alert(`更新失敗：${err.message}`);
+            }
+          });
+
+          document.getElementById('btn-delete-post')?.addEventListener('click', async () => {
+            if (!confirm('確定要刪除此篇典藏與對應檔案嗎？此操作無法復原。')) return;
+            try {
+              await deletePost(post);
+              window.location.href = './index.html';
+            } catch (err) {
+              alert(`刪除失敗：${err.message}`);
+            }
+          });
+        }
+      } catch (err) {
+        await mountNavbar();
+        root.innerHTML = `<p class="text-sm text-red-800">無法載入文章：${escapeHTML(err.message)}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
