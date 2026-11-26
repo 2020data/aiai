@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>批次匯入典藏 — 人工智慧與演講紀錄典藏館</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <link rel="stylesheet" href="./styles/editorial.css" />
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+    <div class="hairline-box p-6 sm:p-8">
+      <p class="font-mono-index text-xs uppercase tracking-widest text-zinc-500">BATCH IMPORT</p>
+      <h1 class="font-serif-editorial text-3xl font-semibold mt-0.5 mb-2">批次匯入典藏檔案</h1>
+      <p class="text-xs text-zinc-600 mb-6">支援 `.zip` 壓縮包（自動解壓）、多選 `.md`/`.tex`/`.pdf`/`.docx`，或貼上 JSON 清單。匯入時將自動套用類別 A / B / C 智慧分類。</p>
+
+      <!-- 模式 1：多檔或 ZIP 上傳 -->
+      <div class="p-4 bg-[#F6F4EF] border border-[#D8D3C8] mb-6 space-y-3">
+        <div class="text-xs font-semibold">方式一：上傳 .zip 壓縮檔或一次多選檔案</div>
+        <input type="file" id="batch-files" multiple accept=".zip,.md,.tex,.pdf,.docx,.pptx" class="text-xs block" />
+        <button id="btn-run-files" type="button" class="editorial-btn !text-xs">開始解析並批次匯入</button>
+      </div>
+
+      <!-- 模式 2：JSON 清單匯入 -->
+      <div class="p-4 bg-[#F6F4EF] border border-[#D8D3C8] space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold">方式二：貼上 JSON 清單批次匯入</span>
+          <button id="btn-download-sample" type="button" class="editorial-btn-outline !py-1 !px-2.5 !text-xs">下載範例 JSON 範本</button>
+        </div>
+        <textarea id="json-input" rows="8" class="editorial-input font-mono-index text-xs" placeholder='[{"title":"演講紀錄範例","raw_text":"# 摘要\n...","creator_name":""}]'></textarea>
+        <button id="btn-run-json" type="button" class="editorial-btn !text-xs">從 JSON 批次寫入資料庫</button>
+      </div>
+
+      <!-- 執行紀錄 -->
+      <div id="batch-log" class="mt-6 p-4 bg-[#18181B] text-[#F6F4EF] font-mono-index text-xs space-y-1 hidden max-h-64 overflow-y-auto"></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { mountNavbar } from './components/navbar.js';
+    import { APP_CONFIG } from './config/app.config.js';
+    import { getCurrentUser } from './modules/auth.module.js';
+    import { createPost, uploadFileToStorage } from './modules/db.module.js';
+    import { classifyContent } from './modules/classifier.module.js';
+
+    await mountNavbar();
+    const user = await getCurrentUser();
+    if (!user) window.location.href = './login.html';
+
+    const logBox = document.getElementById('batch-log');
+    const log = (msg) => {
+      logBox.classList.remove('hidden');
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logBox.appendChild(line);
+      logBox.scrollTop = logBox.scrollHeight;
+    };
+
+    async function importSingleFile(name, blob) {
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      const title = name.replace(/\.[^.]+$/, '').split('/').pop();
+
+      if (ext === 'md' || ext === 'tex') {
+        const text = await blob.text();
+        const cls = classifyContent(title, text);
+        await createPost({
+          title,
+          category: cls.category,
+          subcategory: cls.subcategory,
+          format: ext === 'tex' ? 'latex' : 'markdown',
+          original_lang: APP_CONFIG.DEFAULT_POST_LANG,
+          raw_text: text
+        });
+        log(`成功匯入文字檔：${title} -> ${cls.category} / ${cls.subcategory}`);
+      } else if (['pdf', 'docx', 'pptx'].includes(ext)) {
+        const fileObj = new File([blob], name.split('/').pop(), { type: blob.type });
+        const { publicUrl } = await uploadFileToStorage(fileObj, 'batch');
+        const cls = classifyContent(title, '');
+        await createPost({
+          title,
+          category: cls.category,
+          subcategory: cls.subcategory,
+          format: ext,
+          original_lang: APP_CONFIG.DEFAULT_POST_LANG,
+          file_url: publicUrl
+        });
+        log(`成功上傳檔案：${title}.${ext} -> ${cls.category}`);
+      } else {
+        log(`略過不支援格式：${name}`);
+      }
+    }
+
+    document.getElementById('btn-run-files').addEventListener('click', async () => {
+      const files = Array.from(document.getElementById('batch-files').files || []);
+      if (!files.length) return alert('請先選擇檔案或 .zip 壓縮檔');
+
+      log(`開始處理 ${files.length} 個項目...`);
+      for (const file of files) {
+        try {
+          if (file.name.toLowerCase().endsWith('.zip')) {
+            const zip = await window.JSZip.loadAsync(file);
+            for (const [entryName, entry] of Object.entries(zip.files)) {
+              if (entry.dir || entryName.startsWith('__MACOSX')) continue;
+              const blob = await entry.async('blob');
+              await importSingleFile(entryName, blob);
+            }
+          } else {
+            await importSingleFile(file.name, file);
+          }
+        } catch (err) {
+          log(`失敗（${file.name}）：${err.message}`);
+        }
+      }
+      log('批次匯入作業完成！');
+    });
+
+    document.getElementById('btn-download-sample').addEventListener('click', () => {
+      const sample = [
+        {
+          title: '2026 生成式 AI 專題演講紀實',
+          raw_text: '# 演講重點\n\n本次演講探討大型語言模型與數學推導：$$f(x)=\\int_0^x e^{-t^2}dt$$',
+          creator_name: '',
+          cover_image_url: ''
+        },
+        {
+          title: '線性代數特徵值應用筆記',
+          category: 'cat_b',
+          subcategory: '線性代數',
+          raw_text: '若 $Av = \\lambda v$，則 $\\lambda$ 為矩陣 $A$ 的特徵值。'
+        }
+      ];
+      const blob = new Blob([JSON.stringify(sample, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'archive-batch-template.json';
+      a.click();
+    });
+
+    document.getElementById('btn-run-json').addEventListener('click', async () => {
+      try {
+        const items = JSON.parse(document.getElementById('json-input').value);
+        if (!Array.isArray(items)) throw new Error('JSON 必須為陣列格式 [...]');
+        log(`準備匯入 ${items.length} 筆 JSON 紀錄...`);
+        for (const item of items) {
+          const cls = classifyContent(item.title || '', item.raw_text || '');
+          await createPost({
+            title: item.title,
+            category: item.category || cls.category,
+            subcategory: item.subcategory || cls.subcategory,
+            format: item.format || 'markdown',
+            original_lang: item.original_lang || APP_CONFIG.DEFAULT_POST_LANG,
+            raw_text: item.raw_text || '',
+            cover_image_url: item.cover_image_url || '',
+            creator_name: item.creator_name || ''
+          });
+          log(`已寫入：${item.title}`);
+        }
+        log('JSON 批次匯入完成！');
+      } catch (err) {
+        log(`JSON 匯入失敗：${err.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
