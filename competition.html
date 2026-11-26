@@ -15,7 +15,7 @@
   <div id="navbar-root"></div>
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-    <!-- 國家與年度選擇列 -->
+    <!-- 校內 / 校外與年度選擇列 -->
     <div id="year-switcher" class="hairline-box p-4 mb-6 flex flex-wrap items-center justify-between gap-3"></div>
 
     <!-- 主內容區 -->
@@ -33,10 +33,10 @@
             <input type="number" id="ed-year" required class="editorial-input" />
           </div>
           <div>
-            <label class="block text-xs font-medium mb-1">國家 / 場域</label>
+            <label class="block text-xs font-medium mb-1">場域分類</label>
             <select id="ed-country" class="editorial-input">
-              <option value="TW">TW 台灣（東海大學）</option>
-              <option value="MY">MY 馬來西亞（UTAR）</option>
+              <option value="IN">校內</option>
+              <option value="OUT">校外</option>
             </select>
           </div>
           <div>
@@ -111,11 +111,13 @@
 
     await mountNavbar('speech_special');
 
+    const getScopeLabel = (code) => APP_CONFIG.COUNTRIES.find((c) => c.code === code)?.label || code;
+
     const params = new URLSearchParams(window.location.search);
     const [allYears, user] = await Promise.all([listSpeechYears().catch(() => []), getCurrentUser()]);
 
     const defaultYear = params.get('year') || allYears[0]?.year || new Date().getFullYear();
-    const defaultCountry = params.get('country') || allYears[0]?.country || 'TW';
+    const defaultCountry = params.get('country') || allYears[0]?.country || 'IN';
     const activeTab = params.get('tab') || 'overview';
 
     const record = await getSpeechPage(defaultYear, defaultCountry).catch(() => null);
@@ -131,7 +133,7 @@
                ? 'bg-[#2E4F3E] text-[#F6F4EF] border-[#2E4F3E]'
                : 'border-[#D8D3C8] bg-[#F6F4EF]'
            }">
-          ${y.year} · ${y.country}
+          ${y.year} · ${escapeHTML(getScopeLabel(y.country))}
         </a>`
       )
       .join('');
@@ -157,12 +159,12 @@
     if (!record) {
       contentRoot.innerHTML = `
         <div class="py-12 text-center space-y-3">
-          <h1 class="font-serif-editorial text-2xl">${escapeHTML(defaultYear)} 年度（${escapeHTML(defaultCountry)}）尚無紀錄</h1>
+          <h1 class="font-serif-editorial text-2xl">${escapeHTML(defaultYear)} 年度（${escapeHTML(getScopeLabel(defaultCountry))}）尚無紀錄</h1>
           <p class="text-sm text-zinc-500">${user ? '請點擊右上角「建立本年度」開始新增專頁。' : '請登入後新增年度演講紀錄。'}</p>
         </div>
       `;
     } else {
-      const countryLabel = APP_CONFIG.COUNTRIES.find((c) => c.code === record.country)?.label || record.country;
+      const scopeLabel = getScopeLabel(record.country);
       const extraTabs = Array.isArray(record.extra_subpages) ? record.extra_subpages : [];
       const tabs = [
         { slug: 'overview', title: '活動總覽', md: record.overview_md },
@@ -182,7 +184,7 @@
         }
 
         <header class="pb-5 mb-6 hairline-b">
-          <div class="font-mono-index text-xs text-[#2E4F3E] mb-1">${record.year} · ${escapeHTML(countryLabel)}</div>
+          <div class="font-mono-index text-xs text-[#2E4F3E] mb-1">${record.year} · ${escapeHTML(scopeLabel)}</div>
           <h1 class="font-serif-editorial text-3xl sm:text-4xl font-semibold">${escapeHTML(record.title)}</h1>
           ${record.subtitle ? `<p class="text-zinc-600 mt-1.5">${escapeHTML(record.subtitle)}</p>` : ''}
           <div class="flex flex-wrap gap-4 text-xs text-zinc-500 mt-3">
@@ -213,7 +215,7 @@
             : ''
         }
 
-        <!-- 子頁面切換列（獨立 &tab= 網址） -->
+        <!-- 子頁面切換列 -->
         <div class="flex flex-wrap gap-2 pb-4 mb-6 hairline-b">
           ${tabs
             .map(
@@ -236,7 +238,6 @@
       renderShareBar(document.getElementById('speech-share-bar'), record.title, window.location.href);
     }
 
-    // 編輯面板與一鍵延續至隔年
     if (user) {
       const editorSec = document.getElementById('speech-editor-section');
       document.getElementById('btn-open-editor')?.addEventListener('click', () => {
