@@ -39,9 +39,10 @@ export const APP_CONFIG = {
     { code: 'IN', label: '校內', short: '校內' },
     { code: 'OUT', label: '校外', short: '校外' }
   ]
-};
-// config/app.config.js（在原本 APP_CONFIG 內新增此區塊）
+  // config/app.config.js（在原本 APP_CONFIG 內新增此區塊）
 
 // 8. NotebookLM 單一互動連結
   NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
 };
+
+
