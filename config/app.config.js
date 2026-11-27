@@ -17,7 +17,7 @@ export const APP_CONFIG = {
   IMGBB_API_KEY: '',
 
   // 4. Google 站內搜尋設定
-  SITE_DOMAIN: 'your-username.github.io/your-repo',
+  SITE_DOMAIN: '2020data.github.io',
   GOOGLE_CSE_CX: '',
 
   // 5. 全頁翻譯後端設定
@@ -41,6 +41,6 @@ export const APP_CONFIG = {
     { code: 'OUT', label: '校外', short: '校外' }
   ],
 
-  // 8. NotebookLM 單一互動連結
-NOTEBOOKLM_URL: 'https://notebooklm.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
+  // 8. NotebookLM 單一互動連結（正式網域為 notebooklm.google.com）
+  NOTEBOOKLM_URL: 'https://notebooklm.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
 };
