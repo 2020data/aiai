@@ -42,5 +42,5 @@ export const APP_CONFIG = {
   ],
 
   // 8. NotebookLM 單一互動連結
-  NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
+NOTEBOOKLM_URL: 'https://notebooklm.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
 };
