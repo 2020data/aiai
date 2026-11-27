@@ -42,27 +42,5 @@ export const APP_CONFIG = {
 };
 // config/app.config.js（在原本 APP_CONFIG 內新增此區塊）
   // 8. NotebookLM 互動外掛清單
-  NOTEBOOKLM_LINKS: [
-    {
-      id: 'main-archive',
-      label: '01 · 典藏總庫助理',
-      title: '人工智慧與演講紀錄典藏知識庫',
-      description: '收錄歷年校內外演講講稿、AI 研究筆記與數學推導文件，可直接針對典藏內容提問。',
-      url: 'https://notebooklm.google.com/notebook/YOUR_NOTEBOOK_ID',
-      mode: 'auto', // 'auto'（自動偵測） | 'embed'（強制大框內嵌） | 'launch'（獨立視窗面板）
-      prompts: [
-        '請整理本館歷年演講的核心主題脈絡',
-        '比較不同年份在大型語言模型議題上的觀點變化',
-        '列出所有包含數學推導或演算法分析的重點摘要'
-      ]
-    },
-    {
-      id: 'custom-embed',
-      label: '02 · 互動外掛示範',
-      title: '可內嵌互動工具／知識庫',
-      description: '可替換為任何允許 iframe 內嵌的 AI 對話頁、公開投影片或互動表單。',
-      url: 'https://example.com',
-      mode: 'embed',
-      prompts: []
-    }
-  ]
+ // 8. NotebookLM 單一互動連結
+  NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31',
