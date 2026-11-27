@@ -86,12 +86,14 @@ export async function mountNavbar(activeCat = '') {
             <span>${t('allArchive')}</span>
           </a>
           ${catButtons}
-          <button type="button" id="nav-nlm-btn"
-             class="cat-nav-btn ${activeCat === 'notebooklm' ? 'is-active' : ''}"
-             style="--btn-accent: #2E4F3E;">
-            ${icon('layers')}
-            <span>NotebookLM 互動</span>
-          </button>
+          <a href="https://notebooklm.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="cat-nav-btn"
+   style="--btn-accent: #2E4F3E;">
+  ${icon('layers')}
+  <span>NotebookLM 互動</span>
+</a>
           <a href="./competition.html"
              class="cat-nav-btn ml-auto ${activeCat === 'speech_special' ? 'is-active' : ''}"
              style="--btn-accent: #4A443B;">
