@@ -76,7 +76,7 @@ export async function mountNavbar(activeCat = '') {
         </div>
       </div>
 
-      <!-- 顯眼可擴充類別按鈕列（類別 A / B / C / 全部典藏 + 歷年專區） -->
+      <!-- 顯眼可擴充類別按鈕列（全部典藏 / 類別 A / B / C / NotebookLM 互動 / 歷年演講專區） -->
       <nav class="hairline-t bg-[#F6F4EF]/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center gap-2">
           <a href="./index.html"
@@ -86,20 +86,18 @@ export async function mountNavbar(activeCat = '') {
             <span>${t('allArchive')}</span>
           </a>
           ${catButtons}
-          <a href="./competition.html"
-             class="cat-nav-btn ml-auto ${activeCat === 'speech_special' ? 'is-active' : ''}"
-             style="--btn-accent: #4A443B;">
-            ${icon('calendar')}
-            <span>${t('speechArchive')}</span>
-          </a>
-         ${catButtons}
           <button type="button" id="nav-nlm-btn"
              class="cat-nav-btn ${activeCat === 'notebooklm' ? 'is-active' : ''}"
              style="--btn-accent: #2E4F3E;">
             ${icon('layers')}
             <span>NotebookLM 互動</span>
           </button>
-          
+          <a href="./competition.html"
+             class="cat-nav-btn ml-auto ${activeCat === 'speech_special' ? 'is-active' : ''}"
+             style="--btn-accent: #4A443B;">
+            ${icon('calendar')}
+            <span>${t('speechArchive')}</span>
+          </a>
         </div>
       </nav>
     </header>
