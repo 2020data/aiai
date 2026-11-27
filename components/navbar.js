@@ -5,7 +5,7 @@ import { getCurrentUser, signOut } from '../modules/auth.module.js';
 import { getSavedLang, t } from '../modules/i18n.module.js';
 import { translatePage } from '../modules/translator.module.js';
 import { icon } from '../modules/icons.module.js';
-
+import { openNotebookLMOverlay } from './notebooklm-panel.js';
 export async function mountNavbar(activeCat = '') {
   const mount = document.getElementById('navbar-root');
   if (!mount) return;
@@ -29,7 +29,7 @@ export async function mountNavbar(activeCat = '') {
       </a>`
     )
     .join('');
-
+  
   mount.innerHTML = `
     <header class="bg-[#FCFBF8] hairline-b sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -92,12 +92,14 @@ export async function mountNavbar(activeCat = '') {
             ${icon('calendar')}
             <span>${t('speechArchive')}</span>
           </a>
-          <a href="./notebooklm.html"
+         ${catButtons}
+          <button type="button" id="nav-nlm-btn"
              class="cat-nav-btn ${activeCat === 'notebooklm' ? 'is-active' : ''}"
              style="--btn-accent: #2E4F3E;">
             ${icon('layers')}
             <span>NotebookLM 互動</span>
-          </a>
+          </button>
+          
         </div>
       </nav>
     </header>
@@ -134,6 +136,11 @@ export async function mountNavbar(activeCat = '') {
   mount.querySelector('#nav-logout-btn')?.addEventListener('click', async () => {
     await signOut();
     window.location.reload();
+  });
+  // 點擊 NotebookLM 按鈕：在當前頁面上直接展開大框（若已在獨立頁則不重複開）
+  mount.querySelector('#nav-nlm-btn')?.addEventListener('click', () => {
+    if (activeCat === 'notebooklm') return;
+    openNotebookLMOverlay();
   });
 
   // 若使用者先前已選擇非預設語系，載入後自動翻譯
