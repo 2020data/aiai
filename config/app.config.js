@@ -8,7 +8,8 @@ export const APP_CONFIG = {
   // 1. Supabase 公開連線設定（Project Settings -> API）
   SUPABASE_URL: 'https://euvhpeygpgruyjojdsbf.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_1lTYfKRQf9HvjlT1ak5cVQ_6K_7JTn-',
-// 2. 全站預設語系
+
+  // 2. 全站預設語系
   DEFAULT_UI_LANG: 'zh-TW',
   DEFAULT_POST_LANG: 'zh-TW',
 
@@ -38,11 +39,8 @@ export const APP_CONFIG = {
   COUNTRIES: [
     { code: 'IN', label: '校內', short: '校內' },
     { code: 'OUT', label: '校外', short: '校外' }
-  ]
-  // config/app.config.js（在原本 APP_CONFIG 內新增此區塊）
+  ],
 
-// 8. NotebookLM 單一互動連結
+  // 8. NotebookLM 單一互動連結
   NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
 };
-
-
