@@ -6,6 +6,7 @@ import { getSavedLang, t } from '../modules/i18n.module.js';
 import { translatePage } from '../modules/translator.module.js';
 import { icon } from '../modules/icons.module.js';
 import { openNotebookLMOverlay } from './notebooklm-panel.js';
+
 export async function mountNavbar(activeCat = '') {
   const mount = document.getElementById('navbar-root');
   if (!mount) return;
@@ -29,7 +30,7 @@ export async function mountNavbar(activeCat = '') {
       </a>`
     )
     .join('');
-  
+
   mount.innerHTML = `
     <header class="bg-[#FCFBF8] hairline-b sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -76,7 +77,7 @@ export async function mountNavbar(activeCat = '') {
         </div>
       </div>
 
-      <!-- 顯眼可擴充類別按鈕列（全部典藏 / 類別 A / B / C / NotebookLM 互動 / 歷年演講專區） -->
+      <!-- 單一列分類導覽列（全部典藏 / 類別 A / B / C / NotebookLM 互動｜歷年演講專區靠右） -->
       <nav class="hairline-t bg-[#F6F4EF]/85">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center gap-2">
           <a href="./index.html"
@@ -86,14 +87,12 @@ export async function mountNavbar(activeCat = '') {
             <span>${t('allArchive')}</span>
           </a>
           ${catButtons}
-          <a href="https://notebooklm.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31"
-   target="_blank"
-   rel="noopener noreferrer"
-   class="cat-nav-btn"
-   style="--btn-accent: #2E4F3E;">
-  ${icon('layers')}
-  <span>NotebookLM 互動</span>
-</a>
+          <button type="button" id="nav-nlm-btn"
+             class="cat-nav-btn ${activeCat === 'notebooklm' ? 'is-active' : ''}"
+             style="--btn-accent: #2E4F3E;">
+            ${icon('layers')}
+            <span>NotebookLM 互動</span>
+          </button>
           <a href="./competition.html"
              class="cat-nav-btn ml-auto ${activeCat === 'speech_special' ? 'is-active' : ''}"
              style="--btn-accent: #4A443B;">
@@ -104,6 +103,12 @@ export async function mountNavbar(activeCat = '') {
       </nav>
     </header>
   `;
+
+  // 點擊 NotebookLM 按鈕：在目前頁面上直接展開大框面板
+  mount.querySelector('#nav-nlm-btn')?.addEventListener('click', () => {
+    if (activeCat === 'notebooklm') return;
+    openNotebookLMOverlay();
+  });
 
   // Google 站內搜尋
   mount.querySelector('#nav-google-search')?.addEventListener('submit', (e) => {
@@ -136,11 +141,6 @@ export async function mountNavbar(activeCat = '') {
   mount.querySelector('#nav-logout-btn')?.addEventListener('click', async () => {
     await signOut();
     window.location.reload();
-  });
-  // 點擊 NotebookLM 按鈕：在當前頁面上直接展開大框（若已在獨立頁則不重複開）
-  mount.querySelector('#nav-nlm-btn')?.addEventListener('click', () => {
-    if (activeCat === 'notebooklm') return;
-    openNotebookLMOverlay();
   });
 
   // 若使用者先前已選擇非預設語系，載入後自動翻譯
