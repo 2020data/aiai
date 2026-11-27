@@ -41,6 +41,7 @@ export const APP_CONFIG = {
   ]
 };
 // config/app.config.js（在原本 APP_CONFIG 內新增此區塊）
-  // 8. NotebookLM 互動外掛清單
- // 8. NotebookLM 單一互動連結
-  NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31',
+
+// 8. NotebookLM 單一互動連結
+  NOTEBOOKLM_URL: 'https://notebook.google.com/notebook/95895d7e-3847-4bb0-88da-4daf332eed31'
+};
