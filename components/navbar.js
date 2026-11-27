@@ -92,6 +92,12 @@ export async function mountNavbar(activeCat = '') {
             ${icon('calendar')}
             <span>${t('speechArchive')}</span>
           </a>
+          <a href="./notebooklm.html"
+             class="cat-nav-btn ${activeCat === 'notebooklm' ? 'is-active' : ''}"
+             style="--btn-accent: #2E4F3E;">
+            ${icon('layers')}
+            <span>NotebookLM 互動</span>
+          </a>
         </div>
       </nav>
     </header>
